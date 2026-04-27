@@ -1007,7 +1007,13 @@ function App(){
 
   const save=useCallback(d=>{fdb.ref('workspace').set(d);},[]);
   const upd=(key,val)=>{const d={...data,[key]:val};setData(d);save(d);};
-  const addLog=(acao,tipo,titulo)=>{const d={...data,log:[logEntry(acao,tipo,titulo),...(data.log||[])].slice(0,100)};setData(d);save(d);};
+  const addLog=(acao,tipo,titulo)=>{
+    // Lê o dado mais recente do storage para não sobrescrever saves anteriores
+    let base=data;
+    try{const s=localStorage.getItem(STORAGE_KEY);if(s)base=JSON.parse(s);}catch(e){}
+    const d={...base,log:[logEntry(acao,tipo,titulo),...(base.log||[])].slice(0,100)};
+    setData(d);save(d);
+  };
   const softDelete=(item,tipo)=>{const entry={id:uid(),_tipo:tipo,_deletadoEm:Date.now(),dados:item};const d={...data,lixeira:[entry,...(data.lixeira||[])].slice(0,200)};setData(d);save(d);};
   const restaurar=item=>{const km={tarefa:'tarefas',projeto:'projetos','reunião':'reunioes',ideia:'ideias',nota:'notas',meta:'metas'};const key=km[item._tipo]||'tarefas';const d={...data,[key]:[...(data[key]||[]),item.dados],lixeira:(data.lixeira||[]).filter(x=>x.id!==item.id)};setData(d);save(d);};
   const delPerm=id=>{const d={...data,lixeira:(data.lixeira||[]).filter(x=>x.id!==id)};setData(d);save(d);};

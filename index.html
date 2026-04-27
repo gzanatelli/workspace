@@ -33,8 +33,16 @@ const fdb = {
         }
       },
       off: function() {},
-      set: function(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      set: function(incomingData) {
+        // Merge com o que já está salvo para evitar sobrescrita
+        try {
+          const existing = localStorage.getItem(STORAGE_KEY);
+          const base = existing ? JSON.parse(existing) : {};
+          const merged = Object.assign({}, base, incomingData);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        } catch(e) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(incomingData));
+        }
       }
     };
   }

@@ -1023,13 +1023,13 @@ function Concursos({concursos,updateConcursos,addLog}){
           <input style=${{...si,width:100}} type="number" placeholder="Meta %" value=${f.meta} onChange=${e=>setF(p=>({...p,meta:e.target.value}))} />
           <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
         </div>
-        ${dados.materias.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem',fontSize:15}}>Nenhuma mat\u00e9ria cadastrada ainda</div>\`}
+        ${dados.materias.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem',fontSize:15}}>Nenhuma mat\u00e9ria cadastrada ainda</div>`}
         <div style=${{display:'grid',gap:'0.75rem'}}>
           ${dados.materias.map(m=>{
             const total=m.questoesCertas+m.questoesErradas;
             const pct=total>0?Math.round(m.questoesCertas/total*100):0;
             return html`
-              <div key=${m.id} style=${{...sc,marginBottom:0,borderLeft:\`4px solid \${m.cor}\`}}>
+              <div key=${m.id} style=${{...sc,marginBottom:0,borderLeft:`4px solid \${m.cor}`}}>
                 <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                   <span style=${{fontWeight:600,fontSize:15,color:C.text}}>${m.nome}</span>
                   <div style=${{display:'flex',gap:8,alignItems:'center'}}>
@@ -1044,13 +1044,13 @@ function Concursos({concursos,updateConcursos,addLog}){
                   <span style=${{fontSize:13,fontWeight:700,color:pct>=(m.meta||70)?'#10b981':'#f59e0b'}}>${pct}% acertos</span>
                 </div>
                 <div style=${{background:'var(--cbr)',borderRadius:99,height:8,overflow:'hidden'}}>
-                  <div style=${{width:\`\${Math.min(pct,100)}%\`,height:'100%',background:pct>=(m.meta||70)?'#10b981':'#f59e0b',borderRadius:99,transition:'width 0.4s'}}></div>
+                  <div style=${{width:`\${Math.min(pct,100)}%`,height:'100%',background:pct>=(m.meta||70)?'#10b981':'#f59e0b',borderRadius:99,transition:'width 0.4s'}}></div>
                 </div>
                 <div style=${{fontSize:12,color:C.muted,marginTop:4}}>Meta: ${m.meta||70}% de acertos</div>
-              </div>\`;
+              </div>`;
           })}
         </div>
-      </div>\`;
+      </div>`;
   }
 
   // Quest\u00f5es
@@ -1074,7 +1074,7 @@ function Concursos({concursos,updateConcursos,addLog}){
               <label style=${sl}>Mat\u00e9ria</label>
               <select style=${si} value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))}>
                 <option value="">Selecione...</option>
-                ${dados.materias.map(m=>html`<option key=${m.id} value=${m.nome}>${m.nome}</option>\`)}
+                ${dados.materias.map(m=>html`<option key=${m.id} value=${m.nome}>${m.nome}</option>`)}
               </select>
             </div>
             <div>
@@ -1102,7 +1102,7 @@ function Concursos({concursos,updateConcursos,addLog}){
             <div key=${q.id} style=${{...sc,marginBottom:0,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
               <div>
                 <span style=${{fontWeight:600,color:C.text,fontSize:14}}>${q.materia}</span>
-                ${q.fonte&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${q.fonte}</span>\`}
+                ${q.fonte&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${q.fonte}</span>`}
                 <div style=${{fontSize:12,color:C.muted,marginTop:2}}>${q.data}</div>
               </div>
               <div style=${{display:'flex',gap:12,alignItems:'center'}}>
@@ -1110,9 +1110,9 @@ function Concursos({concursos,updateConcursos,addLog}){
                 <span style=${{fontSize:14,color:'#ef4444',fontWeight:700}}>\u2717 ${q.erradas}</span>
                 <span style=${{fontSize:14,fontWeight:700,color:Math.round(q.certas/q.total*100)>=70?'#10b981':'#f59e0b'}}>${Math.round(q.certas/q.total*100)}%</span>
               </div>
-            </div>\`)}
+            </div>`)}
         </div>
-      </div>\`;
+      </div>`;
   }
 
   // Simulados
@@ -1140,7 +1140,7 @@ function Concursos({concursos,updateConcursos,addLog}){
           ${dados.simulados.length>0&&html`<div style=${{...sc,marginBottom:0,textAlign:'center'}}>
             <div style=${{fontSize:28,fontWeight:700,color:'#10b981'}}>${Math.max(...dados.simulados.map(s=>Math.round(s.nota/s.total*100)))}%</div>
             <div style=${{fontSize:13,color:C.muted}}>melhor nota</div>
-          </div>\`}
+          </div>`}
         </div>
         <div style=${{...sc}}>
           <h3 style=${{fontSize:15,fontWeight:700,marginBottom:'1rem',color:C.text}}>Adicionar simulado</h3>
@@ -1158,7 +1158,7 @@ function Concursos({concursos,updateConcursos,addLog}){
         </div>
         <div style=${{display:'grid',gap:'0.6rem'}}>
           ${dados.simulados.map(s=>{const pct=Math.round(s.nota/s.total*100);return html`
-            <div key=${s.id} style=${{...sc,marginBottom:0,borderLeft:\`4px solid \${pct>=70?'#10b981':'#f59e0b'}\`}}>
+            <div key=${s.id} style=${{...sc,marginBottom:0,borderLeft:`4px solid \${pct>=70?'#10b981':'#f59e0b'}`}}>
               <div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                 <div>
                   <div style=${{fontWeight:600,fontSize:15,color:C.text}}>${s.nome}</div>
@@ -1170,11 +1170,11 @@ function Concursos({concursos,updateConcursos,addLog}){
                 </div>
               </div>
               <div style=${{background:'var(--cbr)',borderRadius:99,height:6,overflow:'hidden',marginTop:10}}>
-                <div style=${{width:\`\${pct}%\`,height:'100%',background:pct>=70?'#10b981':'#f59e0b',borderRadius:99}}></div>
+                <div style=${{width:`\${pct}%`,height:'100%',background:pct>=70?'#10b981':'#f59e0b',borderRadius:99}}></div>
               </div>
-            </div>\`;})}
+            </div>`;})}
         </div>
-      </div>\`;
+      </div>`;
   }
 
   // Edital
@@ -1194,10 +1194,10 @@ function Concursos({concursos,updateConcursos,addLog}){
               <span style=${{fontWeight:700,fontSize:18,color:pct===100?'#10b981':C.primary}}>${pct}%</span>
             </div>
             <div style=${{background:'var(--cbr)',borderRadius:99,height:10,overflow:'hidden'}}>
-              <div style=${{width:\`\${pct}%\`,height:'100%',background:pct===100?'#10b981':C.primary,borderRadius:99,transition:'width 0.4s'}}></div>
+              <div style=${{width:`\${pct}%`,height:'100%',background:pct===100?'#10b981':C.primary,borderRadius:99,transition:'width 0.4s'}}></div>
             </div>
             <div style=${{fontSize:13,color:C.muted,marginTop:6}}>${feitos} de ${dados.edital.length} t\u00f3picos estudados</div>
-          </div>\`}
+          </div>`}
         <div style=${{display:'flex',gap:10,marginBottom:'1.25rem',flexWrap:'wrap'}}>
           <input style=${{...si,flex:2,minWidth:150}} placeholder="T\u00f3pico do edital..." value=${f.topico} onChange=${e=>setF(p=>({...p,topico:e.target.value}))} />
           <input style=${{...si,flex:1,minWidth:120}} placeholder="Mat\u00e9ria" value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))} />
@@ -1209,12 +1209,12 @@ function Concursos({concursos,updateConcursos,addLog}){
               <input type="checkbox" checked=${t.feito} onChange=${()=>toggle(t.id)} style=${{width:18,height:18,cursor:'pointer',accentColor:C.primary}} />
               <div style=${{flex:1}}>
                 <span style=${{fontSize:14,color:C.text,fontWeight:500,textDecoration:t.feito?'line-through':'none'}}>${t.topico}</span>
-                ${t.materia&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${t.materia}</span>\`}
+                ${t.materia&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${t.materia}</span>`}
               </div>
               <button onClick=${()=>del(t.id)} style=${{...sb,background:'transparent',color:C.muted,padding:'0.2rem 0.5rem',fontSize:12}}>\u2715</button>
-            </div>\`)}
+            </div>`)}
         </div>
-      </div>\`;
+      </div>`;
   }
 
   // Horas
@@ -1227,7 +1227,7 @@ function Concursos({concursos,updateConcursos,addLog}){
       const hoje=new Date().toISOString().split('T')[0];
       const log=[{data:hoje,horas:h},...(dados.horasLog||[]).filter(x=>x.data!==hoje)].slice(0,30);
       upd({horasHoje:h,horasMeta:meta,horasLog:log});
-      addLog('registrou','horas de estudo',\`\${h}h\`);
+      addLog('registrou','horas de estudo',`\${h}h`);
       setHojeH('');
     };
     const semana=(dados.horasLog||[]).slice(0,7);
@@ -1271,12 +1271,12 @@ function Concursos({concursos,updateConcursos,addLog}){
               ${semana.slice().reverse().map(x=>html`
                 <div key=${x.data} style=${{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
                   <span style=${{fontSize:11,fontWeight:600,color:x.horas>=(dados.horasMeta||6)?'#10b981':'#f59e0b'}}>${x.horas}h</span>
-                  <div style=${{width:'100%',background:x.horas>=(dados.horasMeta||6)?'#10b981':'#6366f1',borderRadius:'4px 4px 0 0',height:\`\${Math.max(8,x.horas/(dados.horasMeta||6)*80)}px\`,minHeight:8}}></div>
+                  <div style=${{width:'100%',background:x.horas>=(dados.horasMeta||6)?'#10b981':'#6366f1',borderRadius:'4px 4px 0 0',height:`\${Math.max(8,x.horas/(dados.horasMeta||6)*80)}px`,minHeight:8}}></div>
                   <span style=${{fontSize:10,color:C.muted}}>${x.data.slice(5)}</span>
-                </div>\`)}
+                </div>`)}
             </div>
-          </div>\`}
-      </div>\`;
+          </div>`}
+      </div>`;
   }
 
   const tabs=[
@@ -1295,16 +1295,16 @@ function Concursos({concursos,updateConcursos,addLog}){
       <div style=${{display:'flex',gap:6,marginBottom:'1.5rem',flexWrap:'wrap'}}>
         ${tabs.map(t=>html`
           <button key=${t.id} onClick=${()=>setTab(t.id)}
-            style=${{...sb,background:tab===t.id?C.primary:'var(--cc)',color:tab===t.id?'#fff':C.muted,border:\`1px solid \${tab===t.id?C.primary:'var(--cbr)'}\`,fontSize:13,padding:'0.45rem 0.9rem'}}>
+            style=${{...sb,background:tab===t.id?C.primary:'var(--cc)',color:tab===t.id?'#fff':C.muted,border:`1px solid \${tab===t.id?C.primary:'var(--cbr)'}`,fontSize:13,padding:'0.45rem 0.9rem'}}>
             ${t.label}
-          </button>\`)}
+          </button>`)}
       </div>
-      ${tab==='materias'&&html`<\${MateriasTab}/>\`}
-      ${tab==='questoes'&&html`<\${QuestoesTab}/>\`}
-      ${tab==='simulados'&&html`<\${SimuladosTab}/>\`}
-      ${tab==='edital'&&html`<\${EditalTab}/>\`}
-      ${tab==='horas'&&html`<\${HorasTab}/>\`}
-    </div>\`;
+      ${tab==='materias'&&html`<\${MateriasTab}/>`}
+      ${tab==='questoes'&&html`<\${QuestoesTab}/>`}
+      ${tab==='simulados'&&html`<\${SimuladosTab}/>`}
+      ${tab==='edital'&&html`<\${EditalTab}/>`}
+      ${tab==='horas'&&html`<\${HorasTab}/>`}
+    </div>`;
 }
 
 function App(){

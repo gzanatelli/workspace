@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>🧠 Meu Workspace</title>
-<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;}
+input,select,textarea,button{font-family:inherit;font-size:14px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:99px;}
+</style>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/htm/dist/htm.umd.js"></script>
@@ -99,9 +108,9 @@ function applyTheme(dark){
 }
 
 // ── Styles ────────────────────────────────────────
-const si={width:'100%',padding:'0.5rem 0.75rem',borderRadius:8,border:'1px solid var(--cbr)',fontSize:13,outline:'none',boxSizing:'border-box',fontFamily:'inherit',background:'var(--cc)',color:'var(--ct)'};
-const sb={padding:'0.5rem 1rem',borderRadius:8,border:'none',cursor:'pointer',fontSize:13,fontWeight:600,fontFamily:'inherit',transition:'all 0.15s'};
-const sc={background:'var(--cc)',borderRadius:12,padding:'1.25rem',marginBottom:'0.75rem',border:'1px solid var(--cbr)',boxShadow:'0 1px 3px rgba(0,0,0,0.04)'};
+const si={width:'100%',padding:'0.55rem 0.8rem',borderRadius:10,border:'1px solid var(--cbr)',fontSize:14,outline:'none',boxSizing:'border-box',fontFamily:'inherit',background:'var(--cc)',color:'var(--ct)'};
+const sb={padding:'0.5rem 1rem',borderRadius:10,border:'none',cursor:'pointer',fontSize:13,fontWeight:600,fontFamily:'inherit',transition:'all 0.15s'};
+const sc={background:'var(--cc)',borderRadius:14,padding:'1.25rem 1.35rem',marginBottom:'0.75rem',border:'1px solid var(--cbr)',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'};
 const sl={fontSize:12,fontWeight:600,color:'var(--cm)',display:'block',marginBottom:4,textTransform:'uppercase',letterSpacing:'0.05em'};
 
 // ── Helpers para inputs controlados ───────────────
@@ -525,7 +534,7 @@ function LogAtividades({log}){
 
 // ── Sidebar ───────────────────────────────────────
 function Sidebar({active,setActive,open,setOpen,counts,exportData,importData,showPomo,setShowPomo,dark,setDark}){
-  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'🗓️',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'📝',label:'Atividades'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
+  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'🗓️',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'📝',label:'Atividades'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
   return html`
     <div style=${{width:open?218:60,minWidth:open?218:60,background:'var(--cs)',display:'flex',flexDirection:'column',padding:'1rem 0.5rem',gap:2,flexShrink:0,transition:'width 0.2s ease',overflow:'hidden'}}>
       <div style=${{display:'flex',alignItems:'center',justifyContent:open?'space-between':'center',padding:open?'0 0.5rem 1rem':'0 0 1rem',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:4}}>
@@ -536,9 +545,9 @@ function Sidebar({active,setActive,open,setOpen,counts,exportData,importData,sho
       </div>
       ${items.map(i=>{const cnt=counts[i.id]||0;return html`
         <button key=${i.id} onClick=${()=>setActive(i.id)} title=${!open?i.label:undefined}
-          style=${{display:'flex',alignItems:'center',gap:open?9:0,justifyContent:open?'flex-start':'center',padding:open?'0.5rem 0.65rem':'0.5rem',borderRadius:8,border:'none',cursor:'pointer',background:active===i.id?'rgba(255,255,255,0.15)':'transparent',color:active===i.id?'#fff':'rgba(255,255,255,0.6)',fontSize:13,fontWeight:active===i.id?600:400,textAlign:'left',width:'100%'}}>
-          <span style=${{fontSize:16,flexShrink:0}}>${i.icon}</span>
-          ${open&&html`<span style=${{whiteSpace:'nowrap',flex:1}}>${i.label}</span>`}
+          style=${{display:'flex',alignItems:'center',gap:open?9:0,justifyContent:open?'flex-start':'center',padding:open?'0.55rem 0.75rem':'0.55rem',borderRadius:8,border:'none',cursor:'pointer',background:active===i.id?'rgba(255,255,255,0.15)':'transparent',color:active===i.id?'#fff':'rgba(255,255,255,0.6)',fontSize:13,fontWeight:active===i.id?600:400,textAlign:'left',width:'100%'}}>
+          <span style=${{fontSize:18,flexShrink:0,lineHeight:1}}>${i.icon}</span>
+          ${open&&html`<span style=${{whiteSpace:'nowrap',flex:1,fontSize:13,fontWeight:500}}>${i.label}</span>`}
           ${open&&cnt>0&&html`<span style=${{background:'rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.7)',fontSize:10,fontWeight:700,padding:'1px 6px',borderRadius:20}}>${cnt}</span>`}
         </button>`;})}
       <div style=${{flex:1}}/>
@@ -1015,9 +1024,9 @@ function Concursos({concursos,updateConcursos,addLog}){
     const del=id=>upd({materias:dados.materias.filter(m=>m.id!==id)});
     return html`<div>
       <div style=${{display:'flex',gap:8,marginBottom:'1rem',flexWrap:'wrap'}}>
-        <input style=${{...si,flex:1,minWidth:150}} placeholder="Nome da matéria" value=${f.nome} onInput=${e=>setF(p=>({...p,nome:e.target.value}))} />
+        <input style=${{...si,flex:1,minWidth:150}} placeholder="Nome da matéria" value=${f.nome} onChange=${e=>setF(p=>({...p,nome:e.target.value}))} />
         <input type="color" value=${f.cor} onChange=${e=>setF(p=>({...p,cor:e.target.value}))} style=${{width:40,height:40,border:'1px solid var(--cbr)',borderRadius:8,cursor:'pointer',padding:2,background:'var(--cc)'}} />
-        <input style=${{...si,width:90}} type="number" placeholder="Meta %" value=${f.meta} onInput=${e=>setF(p=>({...p,meta:e.target.value}))} />
+        <input style=${{...si,width:90}} type="number" placeholder="Meta %" value=${f.meta} onChange=${e=>setF(p=>({...p,meta:e.target.value}))} />
         <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
       </div>
       ${dados.materias.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem'}}>Nenhuma matéria cadastrada ainda</div>`}
@@ -1067,9 +1076,9 @@ function Concursos({concursos,updateConcursos,addLog}){
               ${dados.materias.map(m=>html`<option key=${m.id} value=${m.nome}>${m.nome}</option>`)}
             </select>
           </div>
-          <div><label style=${sl}>Fonte</label><input style=${si} placeholder="QConcursos..." value=${f.fonte} onInput=${e=>setF(p=>({...p,fonte:e.target.value}))} /></div>
-          <div><label style=${sl}>Total de questões</label><input style=${si} type="number" min="1" value=${f.quantidade} onInput=${e=>setF(p=>({...p,quantidade:e.target.value}))} /></div>
-          <div><label style=${sl}>Questões certas</label><input style=${si} type="number" min="0" value=${f.certas} onInput=${e=>setF(p=>({...p,certas:e.target.value}))} /></div>
+          <div><label style=${sl}>Fonte</label><input style=${si} placeholder="QConcursos..." value=${f.fonte} onChange=${e=>setF(p=>({...p,fonte:e.target.value}))} /></div>
+          <div><label style=${sl}>Total de questões</label><input style=${si} type="number" min="1" value=${f.quantidade} onChange=${e=>setF(p=>({...p,quantidade:e.target.value}))} /></div>
+          <div><label style=${sl}>Questões certas</label><input style=${si} type="number" min="0" value=${f.certas} onChange=${e=>setF(p=>({...p,certas:e.target.value}))} /></div>
         </div>
         <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'0.75rem'}}>
           <span style=${{fontWeight:700,color:Number(f.certas)/Number(f.quantidade)>=0.7?'#10b981':'#f59e0b'}}>${f.quantidade>0?Math.round(Number(f.certas)/Number(f.quantidade)*100):0}% acerto</span>
@@ -1104,9 +1113,9 @@ function Concursos({concursos,updateConcursos,addLog}){
       </div>
       <div style=${sc}>
         <div style=${{display:'grid',gap:'0.6rem',gridTemplateColumns:'1fr 1fr'}}>
-          <div style=${{gridColumn:'1/-1'}}><label style=${sl}>Nome</label><input style=${si} placeholder="Simulado CEBRASPE..." value=${f.nome} onInput=${e=>setF(p=>({...p,nome:e.target.value}))} /></div>
-          <div><label style=${sl}>Acertos</label><input style=${si} type="number" value=${f.nota} onInput=${e=>setF(p=>({...p,nota:e.target.value}))} /></div>
-          <div><label style=${sl}>Total</label><input style=${si} type="number" value=${f.total} onInput=${e=>setF(p=>({...p,total:e.target.value}))} /></div>
+          <div style=${{gridColumn:'1/-1'}}><label style=${sl}>Nome</label><input style=${si} placeholder="Simulado CEBRASPE..." value=${f.nome} onChange=${e=>setF(p=>({...p,nome:e.target.value}))} /></div>
+          <div><label style=${sl}>Acertos</label><input style=${si} type="number" value=${f.nota} onChange=${e=>setF(p=>({...p,nota:e.target.value}))} /></div>
+          <div><label style=${sl}>Total</label><input style=${si} type="number" value=${f.total} onChange=${e=>setF(p=>({...p,total:e.target.value}))} /></div>
           <div><label style=${sl}>Data</label><input style=${si} type="date" value=${f.data} onChange=${e=>setF(p=>({...p,data:e.target.value}))} /></div>
         </div>
         <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff',marginTop:'0.75rem'}}>Salvar</button>
@@ -1136,8 +1145,8 @@ function Concursos({concursos,updateConcursos,addLog}){
         <div style=${{fontSize:12,color:C.muted,marginTop:4}}>${dados.edital.filter(t=>t.feito).length} de ${dados.edital.length} tópicos</div>
       </div>`}
       <div style=${{display:'flex',gap:8,marginBottom:'1rem',flexWrap:'wrap'}}>
-        <input style=${{...si,flex:2,minWidth:150}} placeholder="Tópico do edital..." value=${f.topico} onInput=${e=>setF(p=>({...p,topico:e.target.value}))} />
-        <input style=${{...si,flex:1,minWidth:100}} placeholder="Matéria" value=${f.materia} onInput=${e=>setF(p=>({...p,materia:e.target.value}))} />
+        <input style=${{...si,flex:2,minWidth:150}} placeholder="Tópico do edital..." value=${f.topico} onChange=${e=>setF(p=>({...p,topico:e.target.value}))} />
+        <input style=${{...si,flex:1,minWidth:100}} placeholder="Matéria" value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))} />
         <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
       </div>
       ${dados.edital.map(t=>html`
@@ -1173,8 +1182,8 @@ function Concursos({concursos,updateConcursos,addLog}){
       </div>
       <div style=${sc}>
         <div style=${{display:'flex',gap:8,flexWrap:'wrap'}}>
-          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Horas hoje</label><input style=${si} type="number" min="0" max="24" step="0.5" placeholder="Ex: 3.5" value=${h} onInput=${e=>setH(e.target.value)} /></div>
-          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Meta diária</label><input style=${si} type="number" min="1" value=${meta} onInput=${e=>setMeta(e.target.value)} /></div>
+          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Horas hoje</label><input style=${si} type="number" min="0" max="24" step="0.5" placeholder="Ex: 3.5" value=${h} onChange=${e=>setH(e.target.value)} /></div>
+          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Meta diária</label><input style=${si} type="number" min="1" value=${meta} onChange=${e=>setMeta(e.target.value)} /></div>
           <div style=${{display:'flex',alignItems:'flex-end'}}><button onClick=${reg} style=${{...sb,background:C.primary,color:'#fff'}}>Registrar</button></div>
         </div>
       </div>

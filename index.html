@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<base target="_top">
-<title>&#129504; Meu Workspace</title>
+<title>🧠 Meu Workspace</title>
 <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}</style>
-<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm/dist/htm.umd.js"></script>
 
 </head>
 <body>
@@ -18,62 +17,59 @@ const {useState,useEffect,useCallback,useRef}=React;
 const html=htm.bind(React.createElement);
 
 // ════════════════════════════════════════════════
-// ════════════════════════════════════════════════
-// Armazenamento: localStorage + Google Sheets via Apps Script
+// Supabase config
+const SUPABASE_URL = 'https://avtgzpkteovbfsymnfse.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGd6cGt0ZW92YmZzeW1uZnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMzQzNzEsImV4cCI6MjA5MjkxMDM3MX0.YreLqtKZn9ETJEpYV0-Lf82fxkliWTNI0yTZjdc-11M';
 const STORAGE_KEY = 'meu_workspace_data';
+const RECORD_ID = 1;
 
-// Detecta se está rodando dentro do Google Apps Script
-const IS_GAS = typeof google !== 'undefined' && google.script;
+async function supabaseGet() {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/workspace?id=eq.${RECORD_ID}&select=data`, {
+      headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY}
+    });
+    const rows = await r.json();
+    if (rows && rows.length > 0 && rows[0].data) return JSON.parse(rows[0].data);
+    return null;
+  } catch(e) { return null; }
+}
+
+async function supabaseSave(data) {
+  try {
+    const json = JSON.stringify(data);
+    localStorage.setItem(STORAGE_KEY, json);
+    await fetch(`${SUPABASE_URL}/rest/v1/workspace`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({id: RECORD_ID, data: json})
+    });
+  } catch(e) {}
+}
 
 const fdb = {
   ref: function(path) {
     return {
       on: function(event, callback) {
-        // Sempre carrega localStorage primeiro (instantâneo)
         const local = localStorage.getItem(STORAGE_KEY);
         if (local) {
-          try { callback({ val: () => JSON.parse(local) }); }
-          catch(e) {}
+          try { callback({ val: () => JSON.parse(local) }); } catch(e) {}
         }
-        // Se estiver no Apps Script, carrega da planilha
-        if (IS_GAS) {
-          google.script.run
-            .withSuccessHandler(function(json) {
-              if (json) {
-                try {
-                  const data = JSON.parse(json);
-                  localStorage.setItem(STORAGE_KEY, json);
-                  callback({ val: () => data });
-                } catch(e) {}
-              } else if (!local) {
-                callback({ val: () => null });
-              }
-            })
-            .withFailureHandler(function() {
-              if (!local) callback({ val: () => null });
-            })
-            .loadData();
-        } else if (!local) {
-          callback({ val: () => null });
-        }
+        supabaseGet().then(data => {
+          if (data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            callback({ val: () => data });
+          } else if (!local) {
+            callback({ val: () => null });
+          }
+        });
       },
       off: function() {},
-      set: function(incomingData) {
-        // Sempre salva no localStorage (instantâneo, sem perda)
-        try {
-          const existing = localStorage.getItem(STORAGE_KEY);
-          const base = existing ? JSON.parse(existing) : {};
-          const merged = Object.assign({}, base, incomingData);
-          const json = JSON.stringify(merged);
-          localStorage.setItem(STORAGE_KEY, json);
-          // Se estiver no Apps Script, salva na planilha também
-          if (IS_GAS) {
-            google.script.run.saveData(json);
-          }
-        } catch(e) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(incomingData));
-        }
-      }
+      set: function(data) { supabaseSave(data); }
     };
   }
 };
@@ -105,8 +101,8 @@ function applyTheme(dark){
 // ── Styles ────────────────────────────────────────
 const si={width:'100%',padding:'0.5rem 0.75rem',borderRadius:8,border:'1px solid var(--cbr)',fontSize:13,outline:'none',boxSizing:'border-box',fontFamily:'inherit',background:'var(--cc)',color:'var(--ct)'};
 const sb={padding:'0.5rem 1rem',borderRadius:8,border:'none',cursor:'pointer',fontSize:13,fontWeight:600,fontFamily:'inherit',transition:'all 0.15s'};
-const sc={background:'var(--cc)',borderRadius:14,padding:'1.4rem',marginBottom:'0.85rem',border:'1px solid var(--cbr)',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'};
-const sl={fontSize:12,fontWeight:700,color:'var(--cm)',display:'block',marginBottom:6,textTransform:'uppercase',letterSpacing:'0.06em'};
+const sc={background:'var(--cc)',borderRadius:12,padding:'1.25rem',marginBottom:'0.75rem',border:'1px solid var(--cbr)',boxShadow:'0 1px 3px rgba(0,0,0,0.04)'};
+const sl={fontSize:12,fontWeight:600,color:'var(--cm)',display:'block',marginBottom:4,textTransform:'uppercase',letterSpacing:'0.05em'};
 
 // ── Helpers para inputs controlados ───────────────
 // No htm+React, onChange é obrigatório para inputs controlados
@@ -143,7 +139,7 @@ function Pomodoro({onClose}){
   return html`
     <div style=${{position:'fixed',bottom:20,right:20,zIndex:500,background:'#1e1e2e',borderRadius:16,padding:'1.25rem',width:240,boxShadow:'0 8px 32px rgba(0,0,0,0.35)',color:'#cdd6f4'}}>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'}}>
-        <span style=${{fontWeight:700,fontSize:13}}>⏱️ Pomodoro <span style=${{color:'#abb2bf',fontWeight:400}}>🎵${sess}</span></span>
+        <span style=${{fontWeight:700,fontSize:13}}>⏱️ Pomodoro <span style=${{color:'#abb2bf',fontWeight:400}}>🍅${sess}</span></span>
         <button onClick=${onClose} style=${{...sb,background:'transparent',color:'#abb2bf',padding:'0 5px',fontSize:13}}>✕</button>
       </div>
       <div style=${{display:'flex',gap:3,marginBottom:'0.75rem'}}>
@@ -160,7 +156,7 @@ function Pomodoro({onClose}){
 
 // ── Block Editor ──────────────────────────────────
 const BMENU=[{type:'paragraph',icon:'¶',label:'Texto'},{type:'h1',icon:'H1',label:'Título 1'},{type:'h2',icon:'H2',label:'Título 2'},{type:'h3',icon:'H3',label:'Título 3'},{type:'checklist',icon:'☑',label:'Checklist'},{type:'code',icon:'</>',label:'Código'},{type:'table',icon:'⊞',label:'Tabela'},{type:'tableref',icon:'🔗',label:'Ref. Tabela'},{type:'divider',icon:'—',label:'Divisor'}];
-const TMPLS={'Ata de Reunião':()=>[{id:uid(),type:'h1',content:'Ata de Reunião'},{id:uid(),type:'paragraph',content:'📅 Data:\n📥 Participantes:'},{id:uid(),type:'h2',content:'Pauta'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Tópico 1',done:false}]},{id:uid(),type:'h2',content:'Decisões'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Próximas ações'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Ação 1',done:false}]}],'Plano de Projeto':()=>[{id:uid(),type:'h1',content:'Plano de Projeto'},{id:uid(),type:'h2',content:'Objetivo'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Escopo'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Entregável 1',done:false}]},{id:uid(),type:'h2',content:'Cronograma'},{id:uid(),type:'table',headers:['Etapa','Prazo','Status'],rows:[['','',''],['','','']]},{id:uid(),type:'h2',content:'Riscos'},{id:uid(),type:'paragraph',content:''}],'Brainstorm':()=>[{id:uid(),type:'h1',content:'Brainstorm'},{id:uid(),type:'h2',content:'Problema'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Ideias'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false},{id:uid(),text:'',done:false}]},{id:uid(),type:'h2',content:'Próximos passos'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false}]}]};
+const TMPLS={'Ata de Reunião':()=>[{id:uid(),type:'h1',content:'Ata de Reunião'},{id:uid(),type:'paragraph',content:'📅 Data:\n👥 Participantes:'},{id:uid(),type:'h2',content:'Pauta'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Tópico 1',done:false}]},{id:uid(),type:'h2',content:'Decisões'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Próximas ações'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Ação 1',done:false}]}],'Plano de Projeto':()=>[{id:uid(),type:'h1',content:'Plano de Projeto'},{id:uid(),type:'h2',content:'Objetivo'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Escopo'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Entregável 1',done:false}]},{id:uid(),type:'h2',content:'Cronograma'},{id:uid(),type:'table',headers:['Etapa','Prazo','Status'],rows:[['','',''],['','','']]},{id:uid(),type:'h2',content:'Riscos'},{id:uid(),type:'paragraph',content:''}],'Brainstorm':()=>[{id:uid(),type:'h1',content:'Brainstorm'},{id:uid(),type:'h2',content:'Problema'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Ideias'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false},{id:uid(),text:'',done:false}]},{id:uid(),type:'h2',content:'Próximos passos'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false}]}]};
 function newBlock(type){const b={id:uid(),type};if(type==='table')return{...b,headers:['Col 1','Col 2'],rows:[['',''],['','']]};if(type==='code')return{...b,content:'',lang:'javascript'};if(type==='tableref')return{...b,tabelaId:''};if(type==='checklist')return{...b,items:[{id:uid(),text:'',done:false}]};return{...b,content:''};}
 
 function CodeBlock({block,onUpdate}){
@@ -529,24 +525,24 @@ function LogAtividades({log}){
 
 // ── Sidebar ───────────────────────────────────────
 function Sidebar({active,setActive,open,setOpen,counts,exportData,importData,showPomo,setShowPomo,dark,setDark}){
-  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'📅',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'📝',label:'Atividades'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
+  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'🗓️',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'📝',label:'Atividades'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
   return html`
     <div style=${{width:open?218:60,minWidth:open?218:60,background:'var(--cs)',display:'flex',flexDirection:'column',padding:'1rem 0.5rem',gap:2,flexShrink:0,transition:'width 0.2s ease',overflow:'hidden'}}>
       <div style=${{display:'flex',alignItems:'center',justifyContent:open?'space-between':'center',padding:open?'0 0.5rem 1rem':'0 0 1rem',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:4}}>
-        ${open&&html`<span style=${{color:'#fff',fontWeight:700,fontSize:16,whiteSpace:'nowrap',letterSpacing:'-0.3px'}}>🧠 Workspace</span>`}
+        ${open&&html`<span style=${{color:'#fff',fontWeight:700,fontSize:14,whiteSpace:'nowrap'}}>🧠 Workspace</span>`}
         <button onClick=${()=>setOpen(o=>!o)} style=${{...sb,background:'rgba(255,255,255,0.08)',color:'rgba(255,255,255,0.6)',padding:'0.3rem 0.5rem',fontSize:12,borderRadius:7,flexShrink:0}}>
           ${open?'◀':'▶'}
         </button>
       </div>
       ${items.map(i=>{const cnt=counts[i.id]||0;return html`
         <button key=${i.id} onClick=${()=>setActive(i.id)} title=${!open?i.label:undefined}
-          style=${{display:'flex',alignItems:'center',gap:open?10:0,justifyContent:open?'flex-start':'center',padding:open?'0.55rem 0.75rem':'0.55rem',borderRadius:10,border:'none',cursor:'pointer',background:active===i.id?'rgba(255,255,255,0.15)':'transparent',color:active===i.id?'#fff':'rgba(255,255,255,0.6)',fontSize:13,fontWeight:active===i.id?600:400,textAlign:'left',width:'100%'}}>
-          <span style=${{fontSize:19,flexShrink:0,lineHeight:1}}>${i.icon}</span>
-          ${open&&html`<span style=${{whiteSpace:'nowrap',flex:1,fontSize:14}}>${i.label}</span>`}
+          style=${{display:'flex',alignItems:'center',gap:open?9:0,justifyContent:open?'flex-start':'center',padding:open?'0.5rem 0.65rem':'0.5rem',borderRadius:8,border:'none',cursor:'pointer',background:active===i.id?'rgba(255,255,255,0.15)':'transparent',color:active===i.id?'#fff':'rgba(255,255,255,0.6)',fontSize:13,fontWeight:active===i.id?600:400,textAlign:'left',width:'100%'}}>
+          <span style=${{fontSize:16,flexShrink:0}}>${i.icon}</span>
+          ${open&&html`<span style=${{whiteSpace:'nowrap',flex:1}}>${i.label}</span>`}
           ${open&&cnt>0&&html`<span style=${{background:'rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.7)',fontSize:10,fontWeight:700,padding:'1px 6px',borderRadius:20}}>${cnt}</span>`}
         </button>`;})}
       <div style=${{flex:1}}/>
-      ${[[showPomo?'⏱️':'⏱️','Pomodoro',()=>setShowPomo(p=>!p)],[dark?'☀️':'🎙',dark?'Modo claro':'Modo escuro',()=>setDark(d=>!d)],['Ὃe','Exportar JSON',exportData],['📂','Importar JSON',importData]].map(([icon,label,fn],i)=>html`
+      ${[[showPomo?'⏱️':'⏱️','Pomodoro',()=>setShowPomo(p=>!p)],[dark?'☀️':'🌙',dark?'Modo claro':'Modo escuro',()=>setDark(d=>!d)],['💾','Exportar JSON',exportData],['📂','Importar JSON',importData]].map(([icon,label,fn],i)=>html`
         <button key=${i} onClick=${fn} title=${!open?label:undefined} style=${{display:'flex',alignItems:'center',gap:open?9:0,justifyContent:open?'flex-start':'center',padding:open?'0.45rem 0.65rem':'0.45rem',borderRadius:8,border:'none',cursor:'pointer',background:'transparent',color:'rgba(255,255,255,0.6)',fontSize:12,textAlign:'left',width:'100%'}}>
           <span style=${{fontSize:15,flexShrink:0}}>${icon}</span>
           ${open&&html`<span style=${{whiteSpace:'nowrap'}}>${label}</span>`}
@@ -628,7 +624,7 @@ function Tarefas({tarefas,updateTarefas,projetos,addLog,softDelete}){
                 <div style=${{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
                   <button onClick=${()=>toggle(t)} style=${{width:18,height:18,borderRadius:'50%',border:'2px solid '+SCOL[t.status],background:t.status==='concluída'?SCOL[t.status]:'transparent',cursor:'pointer',flexShrink:0}}/>
                   <span style=${{fontWeight:600,fontSize:14,textDecoration:t.status==='concluída'?'line-through':'none',color:t.status==='concluída'?C.muted:C.text}}>${t.titulo}</span>
-                  ${t._recorrencia&&t._recorrencia!=='none'&&html`<span style=${{fontSize:10,color:C.primary,background:C.primary+'15',padding:'1px 6px',borderRadius:10}}>ὐ4 ${t._recorrencia}</span>`}
+                  ${t._recorrencia&&t._recorrencia!=='none'&&html`<span style=${{fontSize:10,color:C.primary,background:C.primary+'15',padding:'1px 6px',borderRadius:10}}>🔄 ${t._recorrencia}</span>`}
                 </div>
                 <div style=${{display:'flex',gap:6,flexWrap:'wrap',marginLeft:26}}>
                   <${Badge} label=${t.status} color=${SCOL[t.status]||C.muted} sm=${true}/>
@@ -862,7 +858,7 @@ function Notas({notas,updateNotas,tabelas,addLog}){
           </div>
           <select style=${{...si,fontSize:11,marginBottom:'0.85rem'}} value=${tmpl} onChange=${e=>setTmpl(e.target.value)}>
             <option value="">📄 Em branco</option>
-            ${Object.keys(TMPLS).map(k=>html`<option key=${k} value=${k}>Ὄb ${k}</option>`)}
+            ${Object.keys(TMPLS).map(k=>html`<option key=${k} value=${k}>📋 ${k}</option>`)}
           </select>
           ${notas.map(n=>html`
             <div key=${n.id} onClick=${()=>setSel(n.id)} style=${{padding:'0.45rem 0.55rem',borderRadius:7,cursor:'pointer',background:sel===n.id?C.primary+'12':'transparent',borderLeft:sel===n.id?'3px solid '+C.primary:'3px solid transparent',marginBottom:2,display:'flex',justifyContent:'space-between',alignItems:'center',gap:5}}>
@@ -991,7 +987,7 @@ function Busca({data}){
   }
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>ὐd Busca Global</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>🔍 Busca Global</h1>
       <input style=${{...si,fontSize:15,padding:'0.65rem 0.9rem',marginBottom:'1.25rem'}} value=${q} onChange=${e=>setQ(e.target.value)} placeholder="Buscar em todo o workspace..."/>
       ${sq.length>1&&results.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem',fontSize:13}}>Nenhum resultado para "${q}"</div>`}
       ${results.map((r,i)=>html`<div key=${i} style=${sc}><div style=${{display:'flex',gap:10,alignItems:'center'}}><span style=${{fontSize:20}}>${r.emoji}</span><div><div style=${{fontWeight:600,fontSize:13,color:C.text}}>${r.titulo}</div><div style=${{fontSize:11,color:C.muted}}>${r.tipo}${r.sub?' · '+r.sub:''}</div></div></div></div>`)}
@@ -1001,310 +997,217 @@ function Busca({data}){
 
 // ── App Root ──────────────────────────────────────
 
-// ── Concursos ──────────────────────────────────────
+// ── Concursos ─────────────────────────────────────────────────────────────
 function Concursos({concursos,updateConcursos,addLog}){
   const dados=concursos||{materias:[],questoes:[],simulados:[],edital:[],horasMeta:6,horasHoje:0,horasLog:[]};
   const [tab,setTab]=useState('materias');
-  const [showForm,setShowForm]=useState(false);
-  const [form,setForm]=useState({});
-  const upd=d=>{updateConcursos({...dados,...d});};
+  const upd=d=>updateConcursos({...dados,...d});
 
-  // Matérias
   function MateriasTab(){
-    const [f,setF]=useState({nome:'',cor:'#6366f1',meta:50});
-    const add=()=>{if(!f.nome.trim())return;const m={id:uid(),nome:f.nome,cor:f.cor,meta:Number(f.meta),horas:0,questoesCertas:0,questoesErradas:0};upd({materias:[...dados.materias,m]});addLog('adicionou','matéria',f.nome);setF({nome:'',cor:'#6366f1',meta:50});};
+    const [f,setF]=useState({nome:'',cor:'#6366f1',meta:70});
+    const add=()=>{
+      if(!f.nome.trim())return;
+      const m={id:uid(),nome:f.nome,cor:f.cor,meta:Number(f.meta),horas:0,questoesCertas:0,questoesErradas:0};
+      upd({materias:[...dados.materias,m]});
+      addLog('adicionou','matéria',f.nome);
+      setF({nome:'',cor:'#6366f1',meta:70});
+    };
     const del=id=>upd({materias:dados.materias.filter(m=>m.id!==id)});
-    const pct=m=>dados.questoesCertas>0?Math.round(m.questoesCertas/(m.questoesCertas+m.questoesErradas)*100)||0:0;
-    return html`
-      <div>
-        <div style=${{display:'flex',gap:10,marginBottom:'1.25rem',flexWrap:'wrap'}}>
-          <input style=${{...si,flex:1,minWidth:150}} placeholder="Nome da matéria" value=${f.nome} onChange=${e=>setF(p=>({...p,nome:e.target.value}))} />
-          <input type="color" value=${f.cor} onChange=${e=>setF(p=>({...p,cor:e.target.value}))} style=${{width:44,height:44,border:'1px solid var(--cbr)',borderRadius:10,cursor:'pointer',padding:2,background:'var(--cc)'}} />
-          <input style=${{...si,width:100}} type="number" placeholder="Meta %" value=${f.meta} onChange=${e=>setF(p=>({...p,meta:e.target.value}))} />
-          <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
-        </div>
-        ${dados.materias.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem',fontSize:15}}>Nenhuma matéria cadastrada ainda</div>`}
-        <div style=${{display:'grid',gap:'0.75rem'}}>
-          ${dados.materias.map(m=>{
-            const total=m.questoesCertas+m.questoesErradas;
-            const pct=total>0?Math.round(m.questoesCertas/total*100):0;
-            return html`
-              <div key=${m.id} style=${{...sc,marginBottom:0,borderLeft:`4px solid ${m.cor}`}}>
-                <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                  <span style=${{fontWeight:600,fontSize:15,color:C.text}}>${m.nome}</span>
-                  <div style=${{display:'flex',gap:8,alignItems:'center'}}>
-                    <span style=${{fontSize:13,color:C.muted}}>${m.horas||0}h estudadas</span>
-                    <button onClick=${()=>del(m.id)} style=${{...sb,background:'#fee2e2',color:'#dc2626',padding:'0.25rem 0.6rem',fontSize:12}}>✕</button>
-                  </div>
-                </div>
-                <div style=${{display:'flex',gap:'1rem',marginBottom:10,flexWrap:'wrap'}}>
-                  <span style=${{fontSize:13,color:'#10b981',fontWeight:600}}>✓ ${m.questoesCertas||0} certas</span>
-                  <span style=${{fontSize:13,color:'#ef4444',fontWeight:600}}>✗ ${m.questoesErradas||0} erradas</span>
-                  <span style=${{fontSize:13,color:C.muted}}>${total} total</span>
-                  <span style=${{fontSize:13,fontWeight:700,color:pct>=(m.meta||70)?'#10b981':'#f59e0b'}}>${pct}% acertos</span>
-                </div>
-                <div style=${{background:'var(--cbr)',borderRadius:99,height:8,overflow:'hidden'}}>
-                  <div style=${{width:`${Math.min(pct,100)}%`,height:'100%',background:pct>=(m.meta||70)?'#10b981':'#f59e0b',borderRadius:99,transition:'width 0.4s'}}></div>
-                </div>
-                <div style=${{fontSize:12,color:C.muted,marginTop:4}}>Meta: ${m.meta||70}% de acertos</div>
-              </div>`;
-          })}
-        </div>
-      </div>`;
+    return html`<div>
+      <div style=${{display:'flex',gap:8,marginBottom:'1rem',flexWrap:'wrap'}}>
+        <input style=${{...si,flex:1,minWidth:150}} placeholder="Nome da matéria" value=${f.nome} onInput=${e=>setF(p=>({...p,nome:e.target.value}))} />
+        <input type="color" value=${f.cor} onChange=${e=>setF(p=>({...p,cor:e.target.value}))} style=${{width:40,height:40,border:'1px solid var(--cbr)',borderRadius:8,cursor:'pointer',padding:2,background:'var(--cc)'}} />
+        <input style=${{...si,width:90}} type="number" placeholder="Meta %" value=${f.meta} onInput=${e=>setF(p=>({...p,meta:e.target.value}))} />
+        <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
+      </div>
+      ${dados.materias.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'2rem'}}>Nenhuma matéria cadastrada ainda</div>`}
+      <div style=${{display:'grid',gap:'0.6rem'}}>
+        ${dados.materias.map(m=>{
+          const total=(m.questoesCertas||0)+(m.questoesErradas||0);
+          const pct=total>0?Math.round((m.questoesCertas||0)/total*100):0;
+          return html`<div key=${m.id} style=${{...sc,marginBottom:0,borderLeft:`4px solid ${m.cor}`}}>
+            <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+              <span style=${{fontWeight:600,fontSize:14}}>${m.nome}</span>
+              <div style=${{display:'flex',gap:8,alignItems:'center'}}>
+                <span style=${{fontSize:12,color:C.muted}}>${m.horas||0}h</span>
+                <button onClick=${()=>del(m.id)} style=${{...sb,background:'#fee2e2',color:'#dc2626',padding:'2px 8px',fontSize:12}}>✕</button>
+              </div>
+            </div>
+            <div style=${{display:'flex',gap:12,marginBottom:8}}>
+              <span style=${{fontSize:13,color:'#10b981',fontWeight:600}}>✓ ${m.questoesCertas||0}</span>
+              <span style=${{fontSize:13,color:'#ef4444',fontWeight:600}}>✗ ${m.questoesErradas||0}</span>
+              <span style=${{fontSize:13,fontWeight:700,color:pct>=(m.meta||70)?'#10b981':'#f59e0b'}}>${pct}%</span>
+            </div>
+            <div style=${{background:'var(--cbr)',borderRadius:99,height:6}}>
+              <div style=${{width:`${Math.min(pct,100)}%`,height:'100%',background:pct>=(m.meta||70)?'#10b981':'#f59e0b',borderRadius:99,transition:'width 0.4s'}}></div>
+            </div>
+          </div>`;
+        })}
+      </div>
+    </div>`;
   }
 
-  // Questões
   function QuestoesTab(){
     const [f,setF]=useState({materia:'',quantidade:10,certas:0,fonte:''});
     const add=()=>{
-      if(!f.materia||!f.quantidade)return;
+      if(!f.materia)return;
       const certas=Number(f.certas),total=Number(f.quantidade),erradas=total-certas;
-      const nova={id:uid(),materia:f.materia,total,certas,erradas,fonte:f.fonte,data:new Date().toISOString().split('T')[0]};
+      const nova={id:uid(),materia:f.materia,total,certas,erradas,fonte:f.fonte,data:new Date().toLocaleDateString('pt-BR')};
       const mats=dados.materias.map(m=>m.nome===f.materia?{...m,questoesCertas:(m.questoesCertas||0)+certas,questoesErradas:(m.questoesErradas||0)+erradas}:m);
       upd({questoes:[nova,...dados.questoes],materias:mats});
       addLog('registrou','questões',f.materia);
       setF({materia:'',quantidade:10,certas:0,fonte:''});
     };
-    return html`
-      <div>
-        <div style=${{...sc,marginBottom:'1.25rem'}}>
-          <h3 style=${{fontSize:15,fontWeight:700,marginBottom:'1rem',color:C.text}}>Registrar sessão de questões</h3>
-          <div style=${{display:'grid',gap:'0.75rem',gridTemplateColumns:'1fr 1fr'}}>
-            <div>
-              <label style=${sl}>Matéria</label>
-              <select style=${si} value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))}>
-                <option value="">Selecione...</option>
-                ${dados.materias.map(m=>html`<option key=${m.id} value=${m.nome}>${m.nome}</option>`)}
-              </select>
-            </div>
-            <div>
-              <label style=${sl}>Fonte (opcional)</label>
-              <input style=${si} placeholder="Ex: QConcursos, CEBRASPE..." value=${f.fonte} onChange=${e=>setF(p=>({...p,fonte:e.target.value}))} />
-            </div>
-            <div>
-              <label style=${sl}>Total de questões</label>
-              <input style=${si} type="number" min="1" value=${f.quantidade} onChange=${e=>setF(p=>({...p,quantidade:e.target.value}))} />
-            </div>
-            <div>
-              <label style=${sl}>Questões certas</label>
-              <input style=${si} type="number" min="0" max=${f.quantidade} value=${f.certas} onChange=${e=>setF(p=>({...p,certas:e.target.value}))} />
-            </div>
+    return html`<div>
+      <div style=${sc}>
+        <div style=${{display:'grid',gap:'0.75rem',gridTemplateColumns:'1fr 1fr'}}>
+          <div><label style=${sl}>Matéria</label>
+            <select style=${si} value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))}>
+              <option value="">Selecione...</option>
+              ${dados.materias.map(m=>html`<option key=${m.id} value=${m.nome}>${m.nome}</option>`)}
+            </select>
           </div>
-          <div style=${{marginTop:'0.75rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style=${{fontSize:15,color:Number(f.certas)/Number(f.quantidade)*100>=70?'#10b981':'#f59e0b',fontWeight:700}}>
-              ${f.quantidade>0?Math.round(Number(f.certas)/Number(f.quantidade)*100):0}% de acerto
-            </span>
-            <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>Registrar</button>
+          <div><label style=${sl}>Fonte</label><input style=${si} placeholder="QConcursos..." value=${f.fonte} onInput=${e=>setF(p=>({...p,fonte:e.target.value}))} /></div>
+          <div><label style=${sl}>Total de questões</label><input style=${si} type="number" min="1" value=${f.quantidade} onInput=${e=>setF(p=>({...p,quantidade:e.target.value}))} /></div>
+          <div><label style=${sl}>Questões certas</label><input style=${si} type="number" min="0" value=${f.certas} onInput=${e=>setF(p=>({...p,certas:e.target.value}))} /></div>
+        </div>
+        <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'0.75rem'}}>
+          <span style=${{fontWeight:700,color:Number(f.certas)/Number(f.quantidade)>=0.7?'#10b981':'#f59e0b'}}>${f.quantidade>0?Math.round(Number(f.certas)/Number(f.quantidade)*100):0}% acerto</span>
+          <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>Registrar</button>
+        </div>
+      </div>
+      ${dados.questoes.slice(0,20).map(q=>html`
+        <div key=${q.id} style=${{...sc,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div><div style=${{fontWeight:600,fontSize:14}}>${q.materia}</div><div style=${{fontSize:12,color:C.muted}}>${q.data}${q.fonte?' · '+q.fonte:''}</div></div>
+          <div style=${{display:'flex',gap:10}}>
+            <span style=${{color:'#10b981',fontWeight:700}}>✓${q.certas}</span>
+            <span style=${{color:'#ef4444',fontWeight:700}}>✗${q.erradas}</span>
+            <span style=${{fontWeight:700,color:Math.round(q.certas/q.total*100)>=70?'#10b981':'#f59e0b'}}>${Math.round(q.certas/q.total*100)}%</span>
           </div>
-        </div>
-        <div style=${{display:'grid',gap:'0.6rem'}}>
-          ${dados.questoes.slice(0,20).map(q=>html`
-            <div key=${q.id} style=${{...sc,marginBottom:0,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
-              <div>
-                <span style=${{fontWeight:600,color:C.text,fontSize:14}}>${q.materia}</span>
-                ${q.fonte&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${q.fonte}</span>`}
-                <div style=${{fontSize:12,color:C.muted,marginTop:2}}>${q.data}</div>
-              </div>
-              <div style=${{display:'flex',gap:12,alignItems:'center'}}>
-                <span style=${{fontSize:14,color:'#10b981',fontWeight:700}}>✓ ${q.certas}</span>
-                <span style=${{fontSize:14,color:'#ef4444',fontWeight:700}}>✗ ${q.erradas}</span>
-                <span style=${{fontSize:14,fontWeight:700,color:Math.round(q.certas/q.total*100)>=70?'#10b981':'#f59e0b'}}>${Math.round(q.certas/q.total*100)}%</span>
-              </div>
-            </div>`)}
-        </div>
-      </div>`;
+        </div>`)}
+    </div>`;
   }
 
-  // Simulados
   function SimuladosTab(){
     const [f,setF]=useState({nome:'',nota:0,total:100,data:new Date().toISOString().split('T')[0],obs:''});
     const add=()=>{
       if(!f.nome.trim())return;
-      const s={id:uid(),...f,nota:Number(f.nota),total:Number(f.total)};
-      upd({simulados:[s,...dados.simulados]});
+      upd({simulados:[{id:uid(),...f,nota:Number(f.nota),total:Number(f.total)},...dados.simulados]});
       addLog('realizou','simulado',f.nome);
       setF({nome:'',nota:0,total:100,data:new Date().toISOString().split('T')[0],obs:''});
     };
     const media=dados.simulados.length>0?Math.round(dados.simulados.reduce((a,s)=>a+Math.round(s.nota/s.total*100),0)/dados.simulados.length):0;
-    return html`
-      <div>
-        <div style=${{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:'0.75rem',marginBottom:'1.25rem'}}>
-          <div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:C.primary}}>${dados.simulados.length}</div>
-            <div style=${{fontSize:13,color:C.muted}}>simulados</div>
-          </div>
-          <div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:media>=70?'#10b981':'#f59e0b'}}>${media}%</div>
-            <div style=${{fontSize:13,color:C.muted}}>média geral</div>
-          </div>
-          ${dados.simulados.length>0&&html`<div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:'#10b981'}}>${Math.max(...dados.simulados.map(s=>Math.round(s.nota/s.total*100)))}%</div>
-            <div style=${{fontSize:13,color:C.muted}}>melhor nota</div>
-          </div>`}
+    return html`<div>
+      <div style=${{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'0.75rem',marginBottom:'1rem'}}>
+        <div style=${{...sc,marginBottom:0,textAlign:'center'}}><div style=${{fontSize:26,fontWeight:700,color:C.primary}}>${dados.simulados.length}</div><div style=${{fontSize:12,color:C.muted}}>simulados</div></div>
+        <div style=${{...sc,marginBottom:0,textAlign:'center'}}><div style=${{fontSize:26,fontWeight:700,color:media>=70?'#10b981':'#f59e0b'}}>${media}%</div><div style=${{fontSize:12,color:C.muted}}>média</div></div>
+      </div>
+      <div style=${sc}>
+        <div style=${{display:'grid',gap:'0.6rem',gridTemplateColumns:'1fr 1fr'}}>
+          <div style=${{gridColumn:'1/-1'}}><label style=${sl}>Nome</label><input style=${si} placeholder="Simulado CEBRASPE..." value=${f.nome} onInput=${e=>setF(p=>({...p,nome:e.target.value}))} /></div>
+          <div><label style=${sl}>Acertos</label><input style=${si} type="number" value=${f.nota} onInput=${e=>setF(p=>({...p,nota:e.target.value}))} /></div>
+          <div><label style=${sl}>Total</label><input style=${si} type="number" value=${f.total} onInput=${e=>setF(p=>({...p,total:e.target.value}))} /></div>
+          <div><label style=${sl}>Data</label><input style=${si} type="date" value=${f.data} onChange=${e=>setF(p=>({...p,data:e.target.value}))} /></div>
         </div>
-        <div style=${{...sc}}>
-          <h3 style=${{fontSize:15,fontWeight:700,marginBottom:'1rem',color:C.text}}>Adicionar simulado</h3>
-          <div style=${{display:'grid',gap:'0.75rem',gridTemplateColumns:'1fr 1fr'}}>
-            <div style=${{gridColumn:'1/-1'}}>
-              <label style=${sl}>Nome do simulado</label>
-              <input style=${si} placeholder="Ex: Simulado CEBRASPE 2024..." value=${f.nome} onChange=${e=>setF(p=>({...p,nome:e.target.value}))} />
-            </div>
-            <div><label style=${sl}>Acertos</label><input style=${si} type="number" value=${f.nota} onChange=${e=>setF(p=>({...p,nota:e.target.value}))} /></div>
-            <div><label style=${sl}>Total de questões</label><input style=${si} type="number" value=${f.total} onChange=${e=>setF(p=>({...p,total:e.target.value}))} /></div>
-            <div><label style=${sl}>Data</label><input style=${si} type="date" value=${f.data} onChange=${e=>setF(p=>({...p,data:e.target.value}))} /></div>
-            <div><label style=${sl}>Observações</label><input style=${si} placeholder="Opcional..." value=${f.obs} onChange=${e=>setF(p=>({...p,obs:e.target.value}))} /></div>
+        <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff',marginTop:'0.75rem'}}>Salvar</button>
+      </div>
+      ${dados.simulados.map(s=>{const pct=Math.round(s.nota/s.total*100);return html`
+        <div key=${s.id} style=${{...sc,borderLeft:`4px solid ${pct>=70?'#10b981':'#f59e0b'}`}}>
+          <div style=${{display:'flex',justifyContent:'space-between'}}>
+            <div><div style=${{fontWeight:600}}>${s.nome}</div><div style=${{fontSize:12,color:C.muted}}>${s.data}</div></div>
+            <div style=${{textAlign:'right'}}><div style=${{fontSize:20,fontWeight:700,color:pct>=70?'#10b981':'#f59e0b'}}>${pct}%</div><div style=${{fontSize:12,color:C.muted}}>${s.nota}/${s.total}</div></div>
           </div>
-          <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff',marginTop:'0.75rem'}}>Salvar simulado</button>
-        </div>
-        <div style=${{display:'grid',gap:'0.6rem'}}>
-          ${dados.simulados.map(s=>{const pct=Math.round(s.nota/s.total*100);return html`
-            <div key=${s.id} style=${{...sc,marginBottom:0,borderLeft:`4px solid ${pct>=70?'#10b981':'#f59e0b'}`}}>
-              <div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-                <div>
-                  <div style=${{fontWeight:600,fontSize:15,color:C.text}}>${s.nome}</div>
-                  <div style=${{fontSize:13,color:C.muted,marginTop:2}}>${s.data}${s.obs?` • ${s.obs}`:''}</div>
-                </div>
-                <div style=${{textAlign:'right'}}>
-                  <div style=${{fontSize:22,fontWeight:700,color:pct>=70?'#10b981':'#f59e0b'}}>${pct}%</div>
-                  <div style=${{fontSize:12,color:C.muted}}>${s.nota}/${s.total}</div>
-                </div>
-              </div>
-              <div style=${{background:'var(--cbr)',borderRadius:99,height:6,overflow:'hidden',marginTop:10}}>
-                <div style=${{width:`${pct}%`,height:'100%',background:pct>=70?'#10b981':'#f59e0b',borderRadius:99}}></div>
-              </div>
-            </div>`;})}
-        </div>
-      </div>`;
+        </div>`;})}
+    </div>`;
   }
 
-  // Edital
   function EditalTab(){
-    const [f,setF]=useState({topico:'',materia:'',peso:1});
-    const add=()=>{if(!f.topico.trim())return;const t={id:uid(),topico:f.topico,materia:f.materia,peso:Number(f.peso)||1,feito:false};upd({edital:[...dados.edital,t]});setF({topico:'',materia:'',peso:1});};
+    const [f,setF]=useState({topico:'',materia:''});
+    const add=()=>{if(!f.topico.trim())return;upd({edital:[...dados.edital,{id:uid(),topico:f.topico,materia:f.materia,feito:false}]});setF({topico:'',materia:''});};
     const toggle=id=>upd({edital:dados.edital.map(t=>t.id===id?{...t,feito:!t.feito}:t)});
     const del=id=>upd({edital:dados.edital.filter(t=>t.id!==id)});
-    const feitos=dados.edital.filter(t=>t.feito).length;
-    const pct=dados.edital.length>0?Math.round(feitos/dados.edital.length*100):0;
-    return html`
-      <div>
-        ${dados.edital.length>0&&html`
-          <div style=${{...sc,marginBottom:'1.25rem'}}>
-            <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-              <span style=${{fontWeight:600,fontSize:15,color:C.text}}>Progresso do Edital</span>
-              <span style=${{fontWeight:700,fontSize:18,color:pct===100?'#10b981':C.primary}}>${pct}%</span>
-            </div>
-            <div style=${{background:'var(--cbr)',borderRadius:99,height:10,overflow:'hidden'}}>
-              <div style=${{width:`${pct}%`,height:'100%',background:pct===100?'#10b981':C.primary,borderRadius:99,transition:'width 0.4s'}}></div>
-            </div>
-            <div style=${{fontSize:13,color:C.muted,marginTop:6}}>${feitos} de ${dados.edital.length} tópicos estudados</div>
-          </div>`}
-        <div style=${{display:'flex',gap:10,marginBottom:'1.25rem',flexWrap:'wrap'}}>
-          <input style=${{...si,flex:2,minWidth:150}} placeholder="Tópico do edital..." value=${f.topico} onChange=${e=>setF(p=>({...p,topico:e.target.value}))} />
-          <input style=${{...si,flex:1,minWidth:120}} placeholder="Matéria" value=${f.materia} onChange=${e=>setF(p=>({...p,materia:e.target.value}))} />
-          <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
+    const pct=dados.edital.length>0?Math.round(dados.edital.filter(t=>t.feito).length/dados.edital.length*100):0;
+    return html`<div>
+      ${dados.edital.length>0&&html`<div style=${{...sc}}>
+        <div style=${{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+          <span style=${{fontWeight:600}}>Progresso</span><span style=${{fontWeight:700,color:pct===100?'#10b981':C.primary}}>${pct}%</span>
         </div>
-        <div style=${{display:'grid',gap:'0.5rem'}}>
-          ${dados.edital.map(t=>html`
-            <div key=${t.id} style=${{...sc,marginBottom:0,display:'flex',alignItems:'center',gap:12,opacity:t.feito?0.6:1}}>
-              <input type="checkbox" checked=${t.feito} onChange=${()=>toggle(t.id)} style=${{width:18,height:18,cursor:'pointer',accentColor:C.primary}} />
-              <div style=${{flex:1}}>
-                <span style=${{fontSize:14,color:C.text,fontWeight:500,textDecoration:t.feito?'line-through':'none'}}>${t.topico}</span>
-                ${t.materia&&html`<span style=${{fontSize:12,color:C.muted,marginLeft:8}}>${t.materia}</span>`}
-              </div>
-              <button onClick=${()=>del(t.id)} style=${{...sb,background:'transparent',color:C.muted,padding:'0.2rem 0.5rem',fontSize:12}}>✕</button>
-            </div>`)}
-        </div>
-      </div>`;
+        <div style=${{background:'var(--cbr)',borderRadius:99,height:8}}><div style=${{width:`${pct}%`,height:'100%',background:pct===100?'#10b981':C.primary,borderRadius:99,transition:'width 0.4s'}}></div></div>
+        <div style=${{fontSize:12,color:C.muted,marginTop:4}}>${dados.edital.filter(t=>t.feito).length} de ${dados.edital.length} tópicos</div>
+      </div>`}
+      <div style=${{display:'flex',gap:8,marginBottom:'1rem',flexWrap:'wrap'}}>
+        <input style=${{...si,flex:2,minWidth:150}} placeholder="Tópico do edital..." value=${f.topico} onInput=${e=>setF(p=>({...p,topico:e.target.value}))} />
+        <input style=${{...si,flex:1,minWidth:100}} placeholder="Matéria" value=${f.materia} onInput=${e=>setF(p=>({...p,materia:e.target.value}))} />
+        <button onClick=${add} style=${{...sb,background:C.primary,color:'#fff'}}>+ Adicionar</button>
+      </div>
+      ${dados.edital.map(t=>html`
+        <div key=${t.id} style=${{...sc,display:'flex',alignItems:'center',gap:10,opacity:t.feito?0.6:1}}>
+          <input type="checkbox" checked=${t.feito} onChange=${()=>toggle(t.id)} style=${{width:16,height:16,cursor:'pointer',accentColor:C.primary}} />
+          <div style=${{flex:1}}>
+            <span style=${{fontSize:13,textDecoration:t.feito?'line-through':'none'}}>${t.topico}</span>
+            ${t.materia&&html`<span style=${{fontSize:11,color:C.muted,marginLeft:6}}>${t.materia}</span>`}
+          </div>
+          <button onClick=${()=>del(t.id)} style=${{...sb,background:'transparent',color:C.muted,padding:'2px 6px',fontSize:11}}>✕</button>
+        </div>`)}
+    </div>`;
   }
 
-  // Horas
   function HorasTab(){
-    const [hojeH,setHojeH]=useState('');
+    const [h,setH]=useState('');
     const [meta,setMeta]=useState(dados.horasMeta||6);
-    const registrar=()=>{
-      if(!hojeH)return;
-      const h=Number(hojeH);
-      const hoje=new Date().toISOString().split('T')[0];
-      const log=[{data:hoje,horas:h},...(dados.horasLog||[]).filter(x=>x.data!==hoje)].slice(0,30);
-      upd({horasHoje:h,horasMeta:meta,horasLog:log});
-      addLog('registrou','horas de estudo',`${h}h`);
-      setHojeH('');
+    const reg=()=>{
+      if(!h)return;
+      const hoje=new Date().toLocaleDateString('pt-BR');
+      const log=[{data:hoje,horas:Number(h)},...(dados.horasLog||[]).filter(x=>x.data!==hoje)].slice(0,30);
+      upd({horasHoje:Number(h),horasMeta:Number(meta),horasLog:log});
+      addLog('registrou','horas',`${h}h`);
+      setH('');
     };
     const semana=(dados.horasLog||[]).slice(0,7);
-    const totalSemana=semana.reduce((a,x)=>a+x.horas,0);
-    return html`
-      <div>
-        <div style=${{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:'0.75rem',marginBottom:'1.25rem'}}>
-          <div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:C.primary}}>${dados.horasHoje||0}h</div>
-            <div style=${{fontSize:13,color:C.muted}}>hoje</div>
-          </div>
-          <div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:'#10b981'}}>${totalSemana}h</div>
-            <div style=${{fontSize:13,color:C.muted}}>essa semana</div>
-          </div>
-          <div style=${{...sc,marginBottom:0,textAlign:'center'}}>
-            <div style=${{fontSize:28,fontWeight:700,color:'#f59e0b'}}>${dados.horasMeta||6}h</div>
-            <div style=${{fontSize:13,color:C.muted}}>meta diária</div>
-          </div>
+    const total=semana.reduce((a,x)=>a+x.horas,0);
+    return html`<div>
+      <div style=${{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'0.75rem',marginBottom:'1rem'}}>
+        <div style=${{...sc,marginBottom:0,textAlign:'center'}}><div style=${{fontSize:26,fontWeight:700,color:C.primary}}>${dados.horasHoje||0}h</div><div style=${{fontSize:12,color:C.muted}}>hoje</div></div>
+        <div style=${{...sc,marginBottom:0,textAlign:'center'}}><div style=${{fontSize:26,fontWeight:700,color:'#10b981'}}>${total}h</div><div style=${{fontSize:12,color:C.muted}}>semana</div></div>
+        <div style=${{...sc,marginBottom:0,textAlign:'center'}}><div style=${{fontSize:26,fontWeight:700,color:'#f59e0b'}}>${dados.horasMeta||6}h</div><div style=${{fontSize:12,color:C.muted}}>meta/dia</div></div>
+      </div>
+      <div style=${sc}>
+        <div style=${{display:'flex',gap:8,flexWrap:'wrap'}}>
+          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Horas hoje</label><input style=${si} type="number" min="0" max="24" step="0.5" placeholder="Ex: 3.5" value=${h} onInput=${e=>setH(e.target.value)} /></div>
+          <div style=${{flex:1,minWidth:100}}><label style=${sl}>Meta diária</label><input style=${si} type="number" min="1" value=${meta} onInput=${e=>setMeta(e.target.value)} /></div>
+          <div style=${{display:'flex',alignItems:'flex-end'}}><button onClick=${reg} style=${{...sb,background:C.primary,color:'#fff'}}>Registrar</button></div>
         </div>
-        <div style=${{...sc,marginBottom:'1.25rem'}}>
-          <h3 style=${{fontSize:15,fontWeight:700,marginBottom:'1rem',color:C.text}}>Registrar horas de hoje</h3>
-          <div style=${{display:'flex',gap:10,flexWrap:'wrap'}}>
-            <div style=${{flex:1,minWidth:120}}>
-              <label style=${sl}>Horas estudadas hoje</label>
-              <input style=${si} type="number" min="0" max="24" step="0.5" placeholder="Ex: 3.5" value=${hojeH} onChange=${e=>setHojeH(e.target.value)} />
-            </div>
-            <div style=${{flex:1,minWidth:120}}>
-              <label style=${sl}>Meta diária (h)</label>
-              <input style=${si} type="number" min="1" max="24" value=${meta} onChange=${e=>setMeta(e.target.value)} />
-            </div>
-            <div style=${{display:'flex',alignItems:'flex-end'}}>
-              <button onClick=${registrar} style=${{...sb,background:C.primary,color:'#fff'}}>Registrar</button>
-            </div>
-          </div>
+      </div>
+      ${semana.length>0&&html`<div style=${sc}>
+        <div style=${{fontWeight:600,marginBottom:'0.75rem'}}>Histórico</div>
+        <div style=${{display:'flex',gap:6,alignItems:'flex-end',height:100}}>
+          ${semana.slice().reverse().map(x=>html`
+            <div key=${x.data} style=${{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3}}>
+              <span style=${{fontSize:10,fontWeight:600,color:x.horas>=(dados.horasMeta||6)?'#10b981':'#f59e0b'}}>${x.horas}h</span>
+              <div style=${{width:'100%',background:x.horas>=(dados.horasMeta||6)?'#10b981':'#6366f1',borderRadius:'3px 3px 0 0',height:`${Math.max(6,x.horas/(dados.horasMeta||6)*80)}px`}}></div>
+              <span style=${{fontSize:9,color:C.muted}}>${x.data.slice(0,5)}</span>
+            </div>`)}
         </div>
-        ${semana.length>0&&html`
-          <div style=${sc}>
-            <h3 style=${{fontSize:15,fontWeight:700,marginBottom:'1rem',color:C.text}}>Histórico recente</h3>
-            <div style=${{display:'flex',gap:8,alignItems:'flex-end',height:120}}>
-              ${semana.slice().reverse().map(x=>html`
-                <div key=${x.data} style=${{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-                  <span style=${{fontSize:11,fontWeight:600,color:x.horas>=(dados.horasMeta||6)?'#10b981':'#f59e0b'}}>${x.horas}h</span>
-                  <div style=${{width:'100%',background:x.horas>=(dados.horasMeta||6)?'#10b981':'#6366f1',borderRadius:'4px 4px 0 0',height:`${Math.max(8,x.horas/(dados.horasMeta||6)*80)}px`,minHeight:8}}></div>
-                  <span style=${{fontSize:10,color:C.muted}}>${x.data.slice(5)}</span>
-                </div>`)}
-            </div>
-          </div>`}
-      </div>`;
+      </div>`}
+    </div>`;
   }
 
-  const tabs=[
-    {id:'materias',label:'Ὅa Matérias'},
-    {id:'questoes',label:'✏️ Questões'},
-    {id:'simulados',label:'📊 Simulados'},
-    {id:'edital',label:'Ὄb Edital'},
-    {id:'horas',label:'⏰ Horas'},
-  ];
+  const tabs=[{id:'materias',label:'📚 Matérias'},{id:'questoes',label:'✏️ Questões'},{id:'simulados',label:'📊 Simulados'},{id:'edital',label:'📋 Edital'},{id:'horas',label:'⏰ Horas'}];
 
-  return html`
-    <div>
-      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem',flexWrap:'wrap',gap:10}}>
-        <h1 style=${{fontSize:24,fontWeight:700,color:C.text}}>🎯 Concursos</h1>
-      </div>
-      <div style=${{display:'flex',gap:6,marginBottom:'1.5rem',flexWrap:'wrap'}}>
-        ${tabs.map(t=>html`
-          <button key=${t.id} onClick=${()=>setTab(t.id)}
-            style=${{...sb,background:tab===t.id?C.primary:'var(--cc)',color:tab===t.id?'#fff':C.muted,border:`1px solid ${tab===t.id?C.primary:'var(--cbr)'}`,fontSize:13,padding:'0.45rem 0.9rem'}}>
-            ${t.label}
-          </button>`)}
-      </div>
-      ${tab==='materias'&&html`<${MateriasTab}/>`}
-      ${tab==='questoes'&&html`<${QuestoesTab}/>`}
-      ${tab==='simulados'&&html`<${SimuladosTab}/>`}
-      ${tab==='edital'&&html`<${EditalTab}/>`}
-      ${tab==='horas'&&html`<${HorasTab}/>`}
-    </div>`;
+  return html`<div>
+    <h1 style=${{fontSize:22,fontWeight:700,marginBottom:'1.25rem'}}>🎯 Concursos</h1>
+    <div style=${{display:'flex',gap:6,marginBottom:'1.25rem',flexWrap:'wrap'}}>
+      ${tabs.map(t=>html`<button key=${t.id} onClick=${()=>setTab(t.id)}
+        style=${{...sb,background:tab===t.id?C.primary:'var(--cc)',color:tab===t.id?'#fff':C.muted,border:`1px solid ${tab===t.id?C.primary:'var(--cbr)'}`,fontSize:13}}>
+        ${t.label}
+      </button>`)}
+    </div>
+    ${tab==='materias'&&html`<${MateriasTab}/>`}
+    ${tab==='questoes'&&html`<${QuestoesTab}/>`}
+    ${tab==='simulados'&&html`<${SimuladosTab}/>`}
+    ${tab==='edital'&&html`<${EditalTab}/>`}
+    ${tab==='horas'&&html`<${HorasTab}/>`}
+  </div>`;
 }
 
 function App(){
@@ -1323,12 +1226,11 @@ function App(){
     ref.on('value',snap=>{
       const val=snap.val();
       if(val){
-        // converter objetos do Firebase em arrays
+        // converter objetos em arrays
         const merged={...EMPTY};
         Object.keys(EMPTY).forEach(k=>{
           const v=val[k];
-          if(k==='concursos'){merged[k]=v&&typeof v==='object'&&!Array.isArray(v)?v:EMPTY[k];}
-          else if(!v)merged[k]=[];
+          if(!v)merged[k]=[];
           else if(Array.isArray(v))merged[k]=v;
           else merged[k]=Object.values(v).filter(Boolean);
         });
@@ -1345,13 +1247,7 @@ function App(){
 
   const save=useCallback(d=>{fdb.ref('workspace').set(d);},[]);
   const upd=(key,val)=>{const d={...data,[key]:val};setData(d);save(d);};
-  const addLog=(acao,tipo,titulo)=>{
-    // Lê o dado mais recente do storage para não sobrescrever saves anteriores
-    let base=data;
-    try{const s=localStorage.getItem(STORAGE_KEY);if(s)base=JSON.parse(s);}catch(e){}
-    const d={...base,log:[logEntry(acao,tipo,titulo),...(base.log||[])].slice(0,100)};
-    setData(d);save(d);
-  };
+  const addLog=(acao,tipo,titulo)=>{const d={...data,log:[logEntry(acao,tipo,titulo),...(data.log||[])].slice(0,100)};setData(d);save(d);};
   const softDelete=(item,tipo)=>{const entry={id:uid(),_tipo:tipo,_deletadoEm:Date.now(),dados:item};const d={...data,lixeira:[entry,...(data.lixeira||[])].slice(0,200)};setData(d);save(d);};
   const restaurar=item=>{const km={tarefa:'tarefas',projeto:'projetos','reunião':'reunioes',ideia:'ideias',nota:'notas',meta:'metas'};const key=km[item._tipo]||'tarefas';const d={...data,[key]:[...(data[key]||[]),item.dados],lixeira:(data.lixeira||[]).filter(x=>x.id!==item.id)};setData(d);save(d);};
   const delPerm=id=>{const d={...data,lixeira:(data.lixeira||[]).filter(x=>x.id!==id)};setData(d);save(d);};
@@ -1363,9 +1259,9 @@ function App(){
 
   if(!loaded)return html`
     <div style=${{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',color:'#9ca3af',flexDirection:'column',gap:10,background:'#f9fafb'}}>
-      <div style=${{fontSize:40}}>ᾞ0</div>
-      <div style=${{fontSize:15}}>Conectando ao Firebase...</div>
-      <div style=${{fontSize:12,color:'#ccc'}}>Verifique se o databaseURL está correto no firebaseConfig</div>
+      <div style=${{fontSize:40}}>🧠</div>
+      <div style=${{fontSize:15}}>Carregando...</div>
+      <div style=${{fontSize:12,color:'#ccc'}}>Aguarde um momento...</div>
     </div>`;
 
   return html`
@@ -1373,7 +1269,7 @@ function App(){
       <${Sidebar} active=${active} setActive=${setActive} open=${sidebarOpen} setOpen=${setSidebarOpen} counts=${counts} exportData=${exportJSON} importData=${importJSON} showPomo=${showPomo} setShowPomo=${setShowPomo} dark=${dark} setDark=${setDark}/>
       <main style=${{flex:1,overflowY:'auto',padding:'1.75rem 2rem'}}>
         ${active==='dashboard'&&html`<${Dashboard} data=${data} setActive=${setActive}/>`}
-        ${active==='concursos'&&html`<${Concursos} concursos=${data.concursos} updateConcursos=${v=>upd('concursos',v)} addLog=${addLog}/>`}
+        ${active==='concursos'&&html`<${Concursos} concursos=${data.concursos} updateConcursos=${v=>save({...data,concursos:v})} addLog=${addLog}/>`}
         ${active==='tarefas'&&html`<${Tarefas} tarefas=${data.tarefas} updateTarefas=${v=>upd('tarefas',v)} projetos=${data.projetos} addLog=${addLog} softDelete=${softDelete}/>`}
         ${active==='projetos'&&html`<${Projetos} projetos=${data.projetos} updateProjetos=${v=>upd('projetos',v)} tarefas=${data.tarefas} addLog=${addLog} softDelete=${softDelete}/>`}
         ${active==='reunioes'&&html`<${Reunioes} reunioes=${data.reunioes} updateReunioes=${v=>upd('reunioes',v)} addLog=${addLog}/>`}
@@ -1393,66 +1289,6 @@ function App(){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
-</script>// Supabase config
-const SUPABASE_URL = 'https://avtgzpkteovbfsymnfse.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGd6cGt0ZW92YmZzeW1uZnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMzQzNzEsImV4cCI6MjA5MjkxMDM3MX0.YreLqtKZn9ETJEpYV0-Lf82fxkliWTNI0yTZjdc-11M';
-const STORAGE_KEY = 'meu_workspace_data';
-const RECORD_ID = 1;
-
-async function supabaseGet() {
-  try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/workspace?id=eq.${RECORD_ID}&select=data`, {
-      headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY}
-    });
-    const rows = await r.json();
-    if (rows && rows.length > 0 && rows[0].data) return JSON.parse(rows[0].data);
-    return null;
-  } catch(e) { return null; }
-}
-
-async function supabaseSave(data) {
-  try {
-    const json = JSON.stringify(data);
-    localStorage.setItem(STORAGE_KEY, json);
-    await fetch(`${SUPABASE_URL}/rest/v1/workspace`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({id: RECORD_ID, data: json})
-    });
-  } catch(e) {}
-}
-
-const fdb = {
-  ref: function(path) {
-    return {
-      on: function(event, callback) {
-        // Carrega localStorage imediatamente
-        const local = localStorage.getItem(STORAGE_KEY);
-        if (local) {
-          try { callback({ val: () => JSON.parse(local) }); } catch(e) {}
-        }
-        // Busca do Supabase em background
-        supabaseGet().then(data => {
-          if (data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            callback({ val: () => data });
-          } else if (!local) {
-            callback({ val: () => null });
-          }
-        });
-      },
-      off: function() {},
-      set: function(data) {
-        supabaseSave(data);
-      }
-    };
-  }
-};
-
+</script>
 </body>
 </html>

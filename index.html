@@ -143,7 +143,7 @@ function Pomodoro({onClose}){
   return html`
     <div style=${{position:'fixed',bottom:20,right:20,zIndex:500,background:'#1e1e2e',borderRadius:16,padding:'1.25rem',width:240,boxShadow:'0 8px 32px rgba(0,0,0,0.35)',color:'#cdd6f4'}}>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'}}>
-        <span style=${{fontWeight:700,fontSize:13}}>⏱️ Pomodoro <span style=${{color:'#abb2bf',fontWeight:400}}>ἴ5${sess}</span></span>
+        <span style=${{fontWeight:700,fontSize:13}}>⏱️ Pomodoro <span style=${{color:'#abb2bf',fontWeight:400}}>🎵${sess}</span></span>
         <button onClick=${onClose} style=${{...sb,background:'transparent',color:'#abb2bf',padding:'0 5px',fontSize:13}}>✕</button>
       </div>
       <div style=${{display:'flex',gap:3,marginBottom:'0.75rem'}}>
@@ -159,8 +159,8 @@ function Pomodoro({onClose}){
 }
 
 // ── Block Editor ──────────────────────────────────
-const BMENU=[{type:'paragraph',icon:'¶',label:'Texto'},{type:'h1',icon:'H1',label:'Título 1'},{type:'h2',icon:'H2',label:'Título 2'},{type:'h3',icon:'H3',label:'Título 3'},{type:'checklist',icon:'☑',label:'Checklist'},{type:'code',icon:'</>',label:'Código'},{type:'table',icon:'⊞',label:'Tabela'},{type:'tableref',icon:'ὑ7',label:'Ref. Tabela'},{type:'divider',icon:'—',label:'Divisor'}];
-const TMPLS={'Ata de Reunião':()=>[{id:uid(),type:'h1',content:'Ata de Reunião'},{id:uid(),type:'paragraph',content:'Ὄ5 Data:\n὆5 Participantes:'},{id:uid(),type:'h2',content:'Pauta'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Tópico 1',done:false}]},{id:uid(),type:'h2',content:'Decisões'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Próximas ações'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Ação 1',done:false}]}],'Plano de Projeto':()=>[{id:uid(),type:'h1',content:'Plano de Projeto'},{id:uid(),type:'h2',content:'Objetivo'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Escopo'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Entregável 1',done:false}]},{id:uid(),type:'h2',content:'Cronograma'},{id:uid(),type:'table',headers:['Etapa','Prazo','Status'],rows:[['','',''],['','','']]},{id:uid(),type:'h2',content:'Riscos'},{id:uid(),type:'paragraph',content:''}],'Brainstorm':()=>[{id:uid(),type:'h1',content:'Brainstorm'},{id:uid(),type:'h2',content:'Problema'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Ideias'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false},{id:uid(),text:'',done:false}]},{id:uid(),type:'h2',content:'Próximos passos'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false}]}]};
+const BMENU=[{type:'paragraph',icon:'¶',label:'Texto'},{type:'h1',icon:'H1',label:'Título 1'},{type:'h2',icon:'H2',label:'Título 2'},{type:'h3',icon:'H3',label:'Título 3'},{type:'checklist',icon:'☑',label:'Checklist'},{type:'code',icon:'</>',label:'Código'},{type:'table',icon:'⊞',label:'Tabela'},{type:'tableref',icon:'🔗',label:'Ref. Tabela'},{type:'divider',icon:'—',label:'Divisor'}];
+const TMPLS={'Ata de Reunião':()=>[{id:uid(),type:'h1',content:'Ata de Reunião'},{id:uid(),type:'paragraph',content:'📅 Data:\n📥 Participantes:'},{id:uid(),type:'h2',content:'Pauta'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Tópico 1',done:false}]},{id:uid(),type:'h2',content:'Decisões'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Próximas ações'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Ação 1',done:false}]}],'Plano de Projeto':()=>[{id:uid(),type:'h1',content:'Plano de Projeto'},{id:uid(),type:'h2',content:'Objetivo'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Escopo'},{id:uid(),type:'checklist',items:[{id:uid(),text:'Entregável 1',done:false}]},{id:uid(),type:'h2',content:'Cronograma'},{id:uid(),type:'table',headers:['Etapa','Prazo','Status'],rows:[['','',''],['','','']]},{id:uid(),type:'h2',content:'Riscos'},{id:uid(),type:'paragraph',content:''}],'Brainstorm':()=>[{id:uid(),type:'h1',content:'Brainstorm'},{id:uid(),type:'h2',content:'Problema'},{id:uid(),type:'paragraph',content:''},{id:uid(),type:'h2',content:'Ideias'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false},{id:uid(),text:'',done:false}]},{id:uid(),type:'h2',content:'Próximos passos'},{id:uid(),type:'checklist',items:[{id:uid(),text:'',done:false}]}]};
 function newBlock(type){const b={id:uid(),type};if(type==='table')return{...b,headers:['Col 1','Col 2'],rows:[['',''],['','']]};if(type==='code')return{...b,content:'',lang:'javascript'};if(type==='tableref')return{...b,tabelaId:''};if(type==='checklist')return{...b,items:[{id:uid(),text:'',done:false}]};return{...b,content:''};}
 
 function CodeBlock({block,onUpdate}){
@@ -212,7 +212,7 @@ function TGrid({headers,rows,onUH,onUC,onAR,onAC,onDR,onDC}){
         <tbody>
           ${rows.map((row,ri)=>html`<tr key=${ri}>
             ${row.map((cell,ci2)=>html`<td key=${ci2} style=${cs}><input style=${ci} value=${cell} onChange=${e=>onUC(ri,ci2,e.target.value)}/></td>`)}
-            <td style=${{...cs,width:32,textAlign:'center'}}><button onClick=${()=>onDR(ri)} style=${{...sb,background:'transparent',color:C.alta,padding:0,fontSize:11,opacity:0.4}}>Ὕ1</button></td>
+            <td style=${{...cs,width:32,textAlign:'center'}}><button onClick=${()=>onDR(ri)} style=${{...sb,background:'transparent',color:C.alta,padding:0,fontSize:11,opacity:0.4}}>🗑</button></td>
           </tr>`)}
           <tr><td colSpan=${headers.length+1} style=${{...cs,textAlign:'center'}}>
             <button onClick=${onAR} style=${{...sb,background:'transparent',color:C.primary,fontSize:12,padding:'3px 10px',fontWeight:400}}>+ linha</button>
@@ -233,7 +233,7 @@ function BlockItem({block,onUpdate,onDelete,onAdd,tabelas}){
     <div onMouseEnter=${()=>setHov(true)} onMouseLeave=${()=>{setHov(false);setMenu(false);}} style=${{position:'relative',display:'flex',gap:6,alignItems:'flex-start',marginBottom:2,minHeight:28}}>
       <div style=${{display:'flex',flexDirection:'column',gap:2,paddingTop:3,opacity:hov?1:0,transition:'opacity 0.12s',flexShrink:0,width:28}}>
         <button onClick=${()=>setMenu(!menu)} style=${{...sb,background:C.primary,color:'#fff',padding:'1px 6px',fontSize:13,borderRadius:6}}>+</button>
-        <button onClick=${onDelete} style=${{...sb,background:'transparent',color:C.muted,padding:'1px 4px',fontSize:11}}>Ὕ1</button>
+        <button onClick=${onDelete} style=${{...sb,background:'transparent',color:C.muted,padding:'1px 4px',fontSize:11}}>🗑</button>
       </div>
       <div style=${{flex:1,minWidth:0}}>
         ${menu&&html`<div style=${{position:'absolute',left:32,top:0,zIndex:200,background:'var(--cc)',border:'1px solid var(--cbr)',borderRadius:10,boxShadow:'0 8px 24px rgba(0,0,0,0.1)',padding:'0.4rem',display:'grid',gridTemplateColumns:'1fr 1fr',gap:3,width:260}}>
@@ -257,14 +257,14 @@ function BlockItem({block,onUpdate,onDelete,onAdd,tabelas}){
         </div>`}
         ${block.type==='tableref'&&html`<div style=${{border:'2px dashed var(--cbr)',borderRadius:8,padding:'0.65rem',margin:'4px 0'}}>
           <div style=${{display:'flex',alignItems:'center',gap:8,marginBottom:rt?8:0}}>
-            <span style=${{fontSize:12,color:C.muted}}>ὑ7</span>
+            <span style=${{fontSize:12,color:C.muted}}>🔗</span>
             <select value=${block.tabelaId||''} onChange=${e=>onUpdate({tabelaId:e.target.value})} style=${{...si,flex:1,fontSize:12,padding:'3px 7px'}}>
               <option value="">— selecionar tabela —</option>
               ${tabelas.map(t=>html`<option key=${t.id} value=${t.id}>${t.titulo}</option>`)}
             </select>
           </div>
           ${rt&&html`<div style=${{overflowX:'auto',fontSize:12}}>
-            <div style=${{fontSize:11,color:C.primary,fontWeight:600,marginBottom:4}}>Ὄa ${rt.titulo}</div>
+            <div style=${{fontSize:11,color:C.primary,fontWeight:600,marginBottom:4}}>📊 ${rt.titulo}</div>
             <table style=${{borderCollapse:'collapse',width:'100%'}}>
               <thead><tr>${rt.headers.map((h,i)=>html`<th key=${i} style=${{border:'1px solid var(--cbr)',padding:'4px 8px',fontWeight:600,color:C.text,background:'var(--cb)'}}>${h}</th>`)}</tr></thead>
               <tbody>${rt.rows.map((row,ri)=>html`<tr key=${ri}>${row.map((cell,ci)=>html`<td key=${ci} style=${{border:'1px solid var(--cbr)',padding:'4px 8px',color:C.text}}>${cell}</td>`)}</tr>`)}</tbody>
@@ -308,7 +308,7 @@ function Kanban({tarefas,updateTarefas}){
               <div style=${{fontWeight:600,fontSize:12,marginBottom:5,color:C.text}}>${t.titulo}</div>
               <div style=${{display:'flex',gap:5,flexWrap:'wrap',marginBottom:6}}>
                 <${Badge} label=${t.prioridade} color=${PCOL[t.prioridade]} sm=${true}/>
-                ${t.prazo&&html`<span style=${{fontSize:10,color:isOverdue(t.prazo)?C.alta:C.muted}}>Ὄ5 ${fmt(t.prazo)}</span>`}
+                ${t.prazo&&html`<span style=${{fontSize:10,color:isOverdue(t.prazo)?C.alta:C.muted}}>📅 ${fmt(t.prazo)}</span>`}
               </div>
               <div style=${{display:'flex',gap:3,flexWrap:'wrap'}}>
                 ${cols.filter(c=>c.k!==col.k).map(c=>html`<button key=${c.k} onClick=${()=>move(t.id,c.k)} style=${{...sb,background:SCOL[c.k]+'15',color:SCOL[c.k],padding:'1px 7px',fontSize:10,fontWeight:500,borderRadius:5}}>→ ${c.l}</button>`)}
@@ -338,7 +338,7 @@ function Etapas({etapas=[],onChange}){
             <select style=${{...si,width:'auto',fontSize:11,padding:'3px 7px'}} value=${e.status} onChange=${ev=>uE(e.id,{status:ev.target.value})}>
               <option value="pendente">Pendente</option><option value="em andamento">Em andamento</option><option value="concluída">Concluída</option>
             </select>
-            <button onClick=${()=>dE(e.id)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>Ὕ1</button>
+            <button onClick=${()=>dE(e.id)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>🗑</button>
           </div>
           ${e.subtopicos.length>0&&html`<div style=${{marginLeft:22,marginBottom:5}}>
             <div style=${{height:3,background:'var(--cbr)',borderRadius:99,marginBottom:6}}><div style=${{height:'100%',width:pr+'%',background:SE[e.status]||C.primary,borderRadius:99}}/></div>
@@ -368,7 +368,7 @@ function Calendario({tarefas,reunioes}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem'}}>
-        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>Ὕ3️ Calendário</h1>
+        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>🗓️ Calendário</h1>
         <div style=${{display:'flex',alignItems:'center',gap:12}}>
           <button onClick=${()=>setM(new Date(y,mo-1,1))} style=${{...sb,background:'var(--cb)',border:'1px solid var(--cbr)',color:C.text,padding:'0.35rem 0.75rem',fontWeight:400}}>◀</button>
           <span style=${{fontWeight:600,fontSize:15,color:C.text,minWidth:150,textAlign:'center'}}>${MN[mo]} ${y}</span>
@@ -393,7 +393,7 @@ function Calendario({tarefas,reunioes}){
         <div style=${{...sc,marginTop:'0.75rem'}}>
           <div style=${{fontWeight:600,fontSize:13,marginBottom:'0.75rem',color:C.text}}>${String(sel).padStart(2,'0')}/${String(mo+1).padStart(2,'0')}/${y}</div>
           ${gI(sel).map((item,i)=>html`<div key=${i} style=${{display:'flex',alignItems:'center',gap:10,padding:'6px 0',borderBottom:'1px solid var(--cbr)'}}>
-            <span style=${{fontSize:14}}>${item._t==='t'?'✅':'Ὄ5'}</span>
+            <span style=${{fontSize:14}}>${item._t==='t'?'✅':'📅'}</span>
             <div>
               <div style=${{fontSize:13,fontWeight:500,color:C.text}}>${item.titulo}</div>
               ${item._t==='t'&&html`<${Badge} label=${item.prioridade} color=${PCOL[item.prioridade]} sm=${true}/>`}
@@ -419,7 +419,7 @@ function Relatorios({tarefas,projetos,log}){
     </div>`;
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>Ὄ8 Relatórios</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>📈 Relatórios</h1>
       <div style=${{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'0.75rem'}}>
         <div style=${sc}>
           <div style=${{fontWeight:600,fontSize:13,marginBottom:'0.85rem',color:C.text}}>Por status</div>
@@ -449,7 +449,7 @@ function Relatorios({tarefas,projetos,log}){
         </div>
       </div>
       <div style=${sc}>
-        <div style=${{fontWeight:600,fontSize:13,marginBottom:'0.75rem',color:C.text}}>Ὅd Atividade recente</div>
+        <div style=${{fontWeight:600,fontSize:13,marginBottom:'0.75rem',color:C.text}}>📝 Atividade recente</div>
         ${(log||[]).length===0&&html`<p style=${{fontSize:12,color:C.muted}}>Nenhuma atividade registrada.</p>`}
         ${(log||[]).slice(0,10).map(e=>html`
           <div key=${e.id} style=${{fontSize:12,color:C.muted,marginBottom:5,display:'flex',gap:6}}}>
@@ -463,12 +463,12 @@ function Relatorios({tarefas,projetos,log}){
 // ── Tags ──────────────────────────────────────────
 function Tags({data}){
   const [sel,setSel]=useState(null);
-  const allItems=[...data.tarefas.map(t=>({...t,_tipo:'Tarefa',_emoji:'✅'})),...data.projetos.map(p=>({...p,_tipo:'Projeto',_emoji:'὜2️'})),...data.ideias.map(i=>({...i,_tipo:'Ideia',_emoji:'Ὂ1'})),...data.notas.map(n=>({...n,_tipo:'Nota',_emoji:'Ὅ3'}))].filter(i=>i.tags);
+  const allItems=[...data.tarefas.map(t=>({...t,_tipo:'Tarefa',_emoji:'✅'})),...data.projetos.map(p=>({...p,_tipo:'Projeto',_emoji:'🗂️'})),...data.ideias.map(i=>({...i,_tipo:'Ideia',_emoji:'💡'})),...data.notas.map(n=>({...n,_tipo:'Nota',_emoji:'📓'}))].filter(i=>i.tags);
   const allTags=[...new Set(allItems.flatMap(i=>i.tags.split(',').map(t=>t.trim()).filter(Boolean)))].sort();
   const filtered=sel?allItems.filter(i=>i.tags&&i.tags.toLowerCase().includes(sel.toLowerCase())):[];
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>Ἷ7️ Tags Globais</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>🏷️ Tags Globais</h1>
       ${allTags.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Adicione tags em tarefas, projetos ou ideias.</div>`}
       <div style=${{display:'flex',gap:6,flexWrap:'wrap',marginBottom:'1.25rem'}}>
         ${allTags.map(tag=>{const count=allItems.filter(i=>i.tags&&i.tags.toLowerCase().includes(tag.toLowerCase())).length;return html`
@@ -491,7 +491,7 @@ function Lixeira({lixeira,onRestaurar,onDeletar}){
   const EX=30*24*60*60*1000,validos=(lixeira||[]).filter(i=>Date.now()-i._deletadoEm<EX);
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 0.5rem',color:C.text}}>Ὕ1️ Lixeira</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 0.5rem',color:C.text}}>🗑️ Lixeira</h1>
       <p style=${{color:C.muted,fontSize:13,marginBottom:'1.5rem'}}>Itens removidos automaticamente após 30 dias.</p>
       ${validos.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Lixeira vazia.</div>`}
       ${validos.map(item=>html`
@@ -502,7 +502,7 @@ function Lixeira({lixeira,onRestaurar,onDeletar}){
           </div>
           <div style=${{display:'flex',gap:6}}>
             <button onClick=${()=>onRestaurar(item)} style=${{...sb,background:C.primary+'15',color:C.primary,padding:'0.3rem 0.75rem',fontSize:12}}>↩ Restaurar</button>
-            <button onClick=${()=>onDeletar(item.id)} style=${{...sb,background:'#fee2e2',color:C.alta,padding:'0.3rem 0.5rem',fontSize:12}}>Ὕ1</button>
+            <button onClick=${()=>onDeletar(item.id)} style=${{...sb,background:'#fee2e2',color:C.alta,padding:'0.3rem 0.5rem',fontSize:12}}>🗑</button>
           </div>
         </div>`)}
     </div>`;
@@ -514,7 +514,7 @@ function LogAtividades({log}){
   const tAgo=ts=>{const d=(Date.now()-ts)/1000;if(d<60)return'agora';if(d<3600)return Math.floor(d/60)+'min';if(d<86400)return Math.floor(d/3600)+'h';return new Date(ts).toLocaleDateString('pt-BR');};
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>Ὅd Log de Atividades</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.5rem',color:C.text}}>📝 Log de Atividades</h1>
       ${(log||[]).length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Nenhuma atividade ainda.</div>`}
       <div style=${{...sc,padding:'0.5rem 1rem'}}>
         ${(log||[]).map((e,i)=>html`
@@ -529,7 +529,7 @@ function LogAtividades({log}){
 
 // ── Sidebar ───────────────────────────────────────
 function Sidebar({active,setActive,open,setOpen,counts,exportData,importData,showPomo,setShowPomo,dark,setDark}){
-  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'📅',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'Ὅd',label:'Atividades'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
+  const items=[{id:'dashboard',icon:'🏠',label:'Dashboard'},{id:'concursos',icon:'🎯',label:'Concursos'},{id:'tarefas',icon:'✅',label:'Tarefas'},{id:'projetos',icon:'🗂️',label:'Projetos'},{id:'reunioes',icon:'📅',label:'Reuniões'},{id:'ideias',icon:'💡',label:'Ideias'},{id:'notas',icon:'📓',label:'Notas'},{id:'tabelas',icon:'📊',label:'Tabelas'},{id:'metas',icon:'🎯',label:'Metas'},{id:'calendario',icon:'📅',label:'Calendário'},{id:'relatorios',icon:'📈',label:'Relatórios'},{id:'tags',icon:'🏷️',label:'Tags'},{id:'log',icon:'📝',label:'Atividades'},{id:'lixeira',icon:'🗑️',label:'Lixeira'},{id:'busca',icon:'🔍',label:'Busca'}];
   return html`
     <div style=${{width:open?218:60,minWidth:open?218:60,background:'var(--cs)',display:'flex',flexDirection:'column',padding:'1rem 0.5rem',gap:2,flexShrink:0,transition:'width 0.2s ease',overflow:'hidden'}}>
       <div style=${{display:'flex',alignItems:'center',justifyContent:open?'space-between':'center',padding:open?'0 0.5rem 1rem':'0 0 1rem',borderBottom:'1px solid rgba(255,255,255,0.08)',marginBottom:4}}>
@@ -546,7 +546,7 @@ function Sidebar({active,setActive,open,setOpen,counts,exportData,importData,sho
           ${open&&cnt>0&&html`<span style=${{background:'rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.7)',fontSize:10,fontWeight:700,padding:'1px 6px',borderRadius:20}}>${cnt}</span>`}
         </button>`;})}
       <div style=${{flex:1}}/>
-      ${[[showPomo?'⏱️':'⏱️','Pomodoro',()=>setShowPomo(p=>!p)],[dark?'☀️':'ἱ9',dark?'Modo claro':'Modo escuro',()=>setDark(d=>!d)],['Ὃe','Exportar JSON',exportData],['Ὄ2','Importar JSON',importData]].map(([icon,label,fn],i)=>html`
+      ${[[showPomo?'⏱️':'⏱️','Pomodoro',()=>setShowPomo(p=>!p)],[dark?'☀️':'🎙',dark?'Modo claro':'Modo escuro',()=>setDark(d=>!d)],['Ὃe','Exportar JSON',exportData],['📂','Importar JSON',importData]].map(([icon,label,fn],i)=>html`
         <button key=${i} onClick=${fn} title=${!open?label:undefined} style=${{display:'flex',alignItems:'center',gap:open?9:0,justifyContent:open?'flex-start':'center',padding:open?'0.45rem 0.65rem':'0.45rem',borderRadius:8,border:'none',cursor:'pointer',background:'transparent',color:'rgba(255,255,255,0.6)',fontSize:12,textAlign:'left',width:'100%'}}>
           <span style=${{fontSize:15,flexShrink:0}}>${icon}</span>
           ${open&&html`<span style=${{whiteSpace:'nowrap'}}>${label}</span>`}
@@ -569,7 +569,7 @@ function Dashboard({data,setActive}){
       ${(venc.length>0||hj.length>0)&&html`
         <div style=${{...sc,background:'#fff7ed',borderLeft:'3px solid '+C.alta,cursor:'pointer',padding:'0.75rem 1rem',marginBottom:'0.75rem'}} onClick=${()=>setActive('tarefas')}>
           ${venc.length>0&&html`<div style=${{fontSize:13,color:C.alta,fontWeight:600}}>⚠️ ${venc.length} tarefa${venc.length>1?'s':''} vencida${venc.length>1?'s':''}!</div>`}
-          ${hj.length>0&&html`<div style=${{fontSize:13,color:C.media,fontWeight:600}}>Ὄc ${hj.length} vence${hj.length===1?'':'m'} hoje</div>`}
+          ${hj.length>0&&html`<div style=${{fontSize:13,color:C.media,fontWeight:600}}>📌 ${hj.length} vence${hj.length===1?'':'m'} hoje</div>`}
         </div>`}
       <div style=${{display:'flex',gap:'0.65rem',marginBottom:'0.75rem',flexWrap:'wrap'}}>
         <${Stat} l="Pendentes" v=${pend.length} c=${C.primary} onClick=${()=>setActive('tarefas')}/>
@@ -585,9 +585,9 @@ function Dashboard({data,setActive}){
         </div>
         <div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:6,color:C.text}}>Reuniões</div><div style=${{fontSize:24,fontWeight:700,color:C.doing}}>${proxR.length}</div><div style=${{fontSize:11,color:C.muted}}>próximas</div></div>
       </div>
-      ${favs.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>⭐ Favoritos</div>${favs.slice(0,5).map(f=>html`<div key=${f.id} style=${{display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><span style=${{fontSize:13}}>${f.status?'✅':f.etapas?'὜2️':'Ὅ3'}</span><span style=${{fontSize:13,color:C.text,flex:1}}>${f.titulo||f.nome}</span>${f.prioridade&&html`<${Badge} label=${f.prioridade} color=${PCOL[f.prioridade]} sm=${true}/>`}</div>`)}</div>`}
-      ${pend.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>Ὄc Próximas tarefas</div>${pend.slice(0,5).map(t=>html`<div key=${t.id} style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><div><span style=${{fontSize:13,fontWeight:500,color:C.text}}>${t.titulo}</span>${t.prazo&&html`<span style=${{marginLeft:7,fontSize:11,color:isOverdue(t.prazo)?C.alta:isSoon(t.prazo)?C.media:C.muted}}>${fmt(t.prazo)}${isOverdue(t.prazo)?' ⚠️':''}</span>`}</div><${Badge} label=${t.prioridade} color=${PCOL[t.prioridade]||C.muted} sm=${true}/></div>`)}</div>`}
-      ${proxR.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>Ὄ5 Próximas reuniões</div>${proxR.slice(0,3).map(r=>html`<div key=${r.id} style=${{padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><div style=${{fontWeight:500,fontSize:13,color:C.text}}>${r.titulo}</div><div style=${{fontSize:11,color:C.muted}}>${fmt(r.data)}${r.horario?' · '+r.horario:''}${r.participantes?' · '+r.participantes:''}</div></div>`)}</div>`}
+      ${favs.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>⭐ Favoritos</div>${favs.slice(0,5).map(f=>html`<div key=${f.id} style=${{display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><span style=${{fontSize:13}}>${f.status?'✅':f.etapas?'🗂️':'📓'}</span><span style=${{fontSize:13,color:C.text,flex:1}}>${f.titulo||f.nome}</span>${f.prioridade&&html`<${Badge} label=${f.prioridade} color=${PCOL[f.prioridade]} sm=${true}/>`}</div>`)}</div>`}
+      ${pend.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>📌 Próximas tarefas</div>${pend.slice(0,5).map(t=>html`<div key=${t.id} style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><div><span style=${{fontSize:13,fontWeight:500,color:C.text}}>${t.titulo}</span>${t.prazo&&html`<span style=${{marginLeft:7,fontSize:11,color:isOverdue(t.prazo)?C.alta:isSoon(t.prazo)?C.media:C.muted}}>${fmt(t.prazo)}${isOverdue(t.prazo)?' ⚠️':''}</span>`}</div><${Badge} label=${t.prioridade} color=${PCOL[t.prioridade]||C.muted} sm=${true}/></div>`)}</div>`}
+      ${proxR.length>0&&html`<div style=${sc}><div style=${{fontWeight:600,fontSize:13,marginBottom:'0.65rem',color:C.text}}>📅 Próximas reuniões</div>${proxR.slice(0,3).map(r=>html`<div key=${r.id} style=${{padding:'5px 0',borderBottom:'1px solid var(--cbr)'}}><div style=${{fontWeight:500,fontSize:13,color:C.text}}>${r.titulo}</div><div style=${{fontSize:11,color:C.muted}}>${fmt(r.data)}${r.horario?' · '+r.horario:''}${r.participantes?' · '+r.participantes:''}</div></div>`)}</div>`}
     </div>`;
 }
 
@@ -633,8 +633,8 @@ function Tarefas({tarefas,updateTarefas,projetos,addLog,softDelete}){
                 <div style=${{display:'flex',gap:6,flexWrap:'wrap',marginLeft:26}}>
                   <${Badge} label=${t.status} color=${SCOL[t.status]||C.muted} sm=${true}/>
                   <${Badge} label=${t.prioridade} color=${PCOL[t.prioridade]||C.muted} sm=${true}/>
-                  ${t.prazo&&html`<span style=${{fontSize:11,color:isOverdue(t.prazo)&&t.status!=='concluída'?C.alta:C.muted}}>Ὄ5 ${fmt(t.prazo)}${isOverdue(t.prazo)&&t.status!=='concluída'?' ⚠️':''}</span>`}
-                  ${t.projeto&&html`<span style=${{fontSize:11,color:C.muted}}>Ὄ1 ${t.projeto}</span>`}
+                  ${t.prazo&&html`<span style=${{fontSize:11,color:isOverdue(t.prazo)&&t.status!=='concluída'?C.alta:C.muted}}>📅 ${fmt(t.prazo)}${isOverdue(t.prazo)&&t.status!=='concluída'?' ⚠️':''}</span>`}
+                  ${t.projeto&&html`<span style=${{fontSize:11,color:C.muted}}>📁 ${t.projeto}</span>`}
                   ${(t._horas||0)>0&&html`<span style=${{fontSize:11,color:C.muted}}>⏰ ${t._horas}h</span>`}
                 </div>
                 ${t.notas&&html`<p style=${{fontSize:12,color:C.muted,marginLeft:26,marginTop:4}}>${t.notas}</p>`}
@@ -643,7 +643,7 @@ function Tarefas({tarefas,updateTarefas,projetos,addLog,softDelete}){
                 <button onClick=${()=>toggleFav(t)} style=${{...sb,background:'transparent',color:t._fav?'#f59e0b':C.muted,padding:'0.15rem 0.4rem',fontSize:14}}>${t._fav?'⭐':'☆'}</button>
                 <button onClick=${()=>{setAddHId(t.id);setHIn(0);}} style=${{...sb,background:'transparent',color:C.muted,padding:'0.15rem 0.4rem',fontSize:11}}>⏰</button>
                 <button onClick=${()=>{setForm({titulo:t.titulo,prazo:t.prazo||'',prioridade:t.prioridade,status:t.status,projeto:t.projeto||'',notas:t.notas||'',tags:t.tags||'',_recorrencia:t._recorrencia||'none',_horas:t._horas||0});setEditId(t.id);setModal(true);}} style=${{...sb,background:'transparent',border:'1px solid var(--cbr)',color:C.muted,padding:'0.15rem 0.4rem',fontSize:11}}>✏️</button>
-                <button onClick=${()=>del(t)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>Ὕ1</button>
+                <button onClick=${()=>del(t)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>🗑</button>
               </div>
             </div>
             ${addHId===t.id&&html`<div style=${{display:'flex',gap:7,alignItems:'center',marginTop:8,marginLeft:26,padding:'0.5rem',background:'var(--cb)',borderRadius:8}}>
@@ -687,7 +687,7 @@ function Projetos({projetos,updateProjetos,tarefas,addLog,softDelete}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>὜2️ Projetos</h1>
+        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>🗂️ Projetos</h1>
         <button onClick=${()=>{setForm({titulo:'',descricao:'',objetivo:'',status:'em andamento',prazo:'',cor:C.primary,tags:''});setEditId(null);setModal(true);}} style=${{...sb,background:C.primary,color:'#fff'}}>+ Novo</button>
       </div>
       ${projetos.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Nenhum projeto ainda.</div>`}
@@ -700,7 +700,7 @@ function Projetos({projetos,updateProjetos,tarefas,addLog,softDelete}){
                 <div style=${{width:10,height:10,borderRadius:'50%',background:cor,flexShrink:0}}/>
                 <span style=${{fontWeight:700,fontSize:15,color:C.text}}>${p.titulo}</span>
                 <${Badge} label=${p.status} color=${SPRC[p.status]||cor} sm=${true}/>
-                ${p.prazo&&html`<span style=${{fontSize:11,color:C.muted}}>Ὄ5 ${fmt(p.prazo)}</span>`}
+                ${p.prazo&&html`<span style=${{fontSize:11,color:C.muted}}>📅 ${fmt(p.prazo)}</span>`}
                 <span style=${{fontSize:12,color:C.muted,marginLeft:'auto'}}>${isE?'▲':'▼'}</span>
               </div>
               ${p.descricao&&html`<p style=${{fontSize:12,color:C.muted,marginTop:4}}>${p.descricao}</p>`}
@@ -708,14 +708,14 @@ function Projetos({projetos,updateProjetos,tarefas,addLog,softDelete}){
             <div style=${{display:'flex',gap:4,marginLeft:8,flexShrink:0}}>
               <button onClick=${()=>toggleFav(p)} style=${{...sb,background:'transparent',color:p._fav?'#f59e0b':C.muted,padding:'0.15rem 0.4rem',fontSize:14}}>${p._fav?'⭐':'☆'}</button>
               <button onClick=${()=>{setForm({titulo:p.titulo,descricao:p.descricao||'',objetivo:p.objetivo||'',status:p.status,prazo:p.prazo||'',cor:p.cor||C.primary,tags:p.tags||''});setEditId(p.id);setModal(true);}} style=${{...sb,background:'transparent',border:'1px solid var(--cbr)',color:C.muted,padding:'0.15rem 0.4rem',fontSize:11}}>✏️</button>
-              <button onClick=${()=>del(p)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>Ὕ1</button>
+              <button onClick=${()=>del(p)} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>🗑</button>
             </div>
           </div>
           ${tP.length>0&&html`<div style=${{marginTop:8}}><div style=${{display:'flex',justifyContent:'space-between',fontSize:11,color:C.muted,marginBottom:3}}><span>${tP.length} tarefas · ${done} concluídas</span><span style=${{fontWeight:700,color:cor}}>${prog}%</span></div><div style=${{height:4,background:'var(--cb)',borderRadius:99}}><div style=${{height:'100%',width:prog+'%',background:cor,borderRadius:99}}/></div></div>`}
           ${isE&&html`<div style=${{marginTop:12,paddingTop:12,borderTop:'1px solid var(--cbr)'}}>
             ${p.objetivo&&html`<p style=${{fontSize:12,marginBottom:10,color:C.text}}><strong>Objetivo:</strong> ${p.objetivo}</p>`}
             <div style=${{display:'flex',gap:6,marginBottom:'0.85rem'}}>
-              ${[['tarefas','✅ Tarefas ('+tP.length+')'],['etapas','Ἴ1 Etapas ('+(p.etapas||[]).length+')']].map(([k,v])=>html`<button key=${k} onClick=${()=>setTabs(pr=>({...pr,[p.id]:k}))} style=${{...sb,background:tab===k?cor:'transparent',color:tab===k?'#fff':C.muted,border:'1px solid var(--cbr)',padding:'0.25rem 0.75rem',fontSize:12,fontWeight:400}}>${v}</button>`)}
+              ${[['tarefas','✅ Tarefas ('+tP.length+')'],['etapas','🏁 Etapas ('+(p.etapas||[]).length+')']].map(([k,v])=>html`<button key=${k} onClick=${()=>setTabs(pr=>({...pr,[p.id]:k}))} style=${{...sb,background:tab===k?cor:'transparent',color:tab===k?'#fff':C.muted,border:'1px solid var(--cbr)',padding:'0.25rem 0.75rem',fontSize:12,fontWeight:400}}>${v}</button>`)}
             </div>
             ${tab==='tarefas'&&html`<div>${tP.length>0?tP.map(t=>html`<div key=${t.id} style=${{display:'flex',alignItems:'center',gap:7,padding:'4px 0',fontSize:12}}><span style=${{color:SCOL[t.status]}}>●</span><span style=${{textDecoration:t.status==='concluída'?'line-through':'none',color:t.status==='concluída'?C.muted:C.text}}>${t.titulo}</span><${Badge} label=${t.prioridade} color=${PCOL[t.prioridade]} sm=${true}/></div>`):html`<p style=${{fontSize:12,color:C.muted}}>Nenhuma tarefa vinculada.</p>`}</div>`}
             ${tab==='etapas'&&html`<${Etapas} etapas=${p.etapas||[]} onChange=${v=>updateProjetos(projetos.map(x=>x.id===p.id?{...x,etapas:v}:x))}/>`}
@@ -753,7 +753,7 @@ function Reunioes({reunioes,updateReunioes,addLog}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>Ὄ5 Reuniões</h1>
+        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>📅 Reuniões</h1>
         <button onClick=${()=>{setForm({titulo:'',data:today(),horario:'',participantes:'',pauta:'',notas:''});setEditId(null);setModal(true);}} style=${{...sb,background:C.primary,color:'#fff'}}>+ Nova</button>
       </div>
       ${sorted.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Nenhuma reunião registrada.</div>`}
@@ -768,7 +768,7 @@ function Reunioes({reunioes,updateReunioes,addLog}){
             </div>
             <div style=${{display:'flex',gap:4}}>
               <button onClick=${()=>{setForm({titulo:r.titulo,data:r.data||'',horario:r.horario||'',participantes:r.participantes||'',pauta:r.pauta||'',notas:r.notas||''});setEditId(r.id);setModal(true);}} style=${{...sb,background:'transparent',border:'1px solid var(--cbr)',color:C.muted,padding:'0.15rem 0.4rem',fontSize:11}}>✏️</button>
-              <button onClick=${()=>updateReunioes(reunioes.filter(x=>x.id!==r.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>Ὕ1</button>
+              <button onClick=${()=>updateReunioes(reunioes.filter(x=>x.id!==r.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>🗑</button>
             </div>
           </div>
           ${isE&&html`<div style=${{marginTop:10,paddingTop:10,borderTop:'1px solid var(--cbr)'}}>
@@ -807,7 +807,7 @@ function Ideias({ideias,updateIdeias,addLog}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>Ὂ1 Ideias</h1>
+        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>💡 Ideias</h1>
         <button onClick=${()=>{setForm({titulo:'',conteudo:'',tags:''});setEditId(null);setModal(true);}} style=${{...sb,background:C.primary,color:'#fff'}}>+ Nova</button>
       </div>
       ${allTags.length>0&&html`<div style=${{display:'flex',gap:5,flexWrap:'wrap',marginBottom:'0.85rem'}}>
@@ -822,7 +822,7 @@ function Ideias({ideias,updateIdeias,addLog}){
               <span style=${{fontWeight:600,fontSize:13,color:'#1a1a1a'}}>${i.titulo}</span>
               <div style=${{display:'flex',gap:3}}>
                 <button onClick=${()=>{setForm({titulo:i.titulo,conteudo:i.conteudo||'',tags:i.tags||''});setEditId(i.id);setModal(true);}} style=${{...sb,background:'transparent',color:'#8a8a8a',padding:'0.1rem 0.35rem',fontSize:11}}>✏️</button>
-                <button onClick=${()=>updateIdeias(ideias.filter(x=>x.id!==i.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.1rem 0.35rem',fontSize:11}}>Ὕ1</button>
+                <button onClick=${()=>updateIdeias(ideias.filter(x=>x.id!==i.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.1rem 0.35rem',fontSize:11}}>🗑</button>
               </div>
             </div>
             ${i.conteudo&&html`<p style=${{fontSize:12,color:'#444',whiteSpace:'pre-wrap'}}>${i.conteudo}</p>`}
@@ -853,7 +853,7 @@ function Notas({notas,updateNotas,tabelas,addLog}){
   const toggleFav=n=>updateNotas(notas.map(x=>x.id===n.id?{...x,_fav:!x._fav}:x));
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>Ὅ3 Notas & Documentos</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>📓 Notas & Documentos</h1>
       <div style=${{display:'grid',gridTemplateColumns:'210px 1fr',gap:'0.75rem',minHeight:480}}>
         <div style=${{...sc,padding:'0.85rem'}}>
           <div style=${{display:'flex',gap:5,marginBottom:7}}>
@@ -861,7 +861,7 @@ function Notas({notas,updateNotas,tabelas,addLog}){
             <button onClick=${criar} style=${{...sb,background:C.primary,color:'#fff',padding:'0.4rem 0.65rem',flexShrink:0,fontSize:13}}>+</button>
           </div>
           <select style=${{...si,fontSize:11,marginBottom:'0.85rem'}} value=${tmpl} onChange=${e=>setTmpl(e.target.value)}>
-            <option value="">Ὄ4 Em branco</option>
+            <option value="">📄 Em branco</option>
             ${Object.keys(TMPLS).map(k=>html`<option key=${k} value=${k}>Ὄb ${k}</option>`)}
           </select>
           ${notas.map(n=>html`
@@ -898,7 +898,7 @@ function Tabelas({tabelas,updateTabelas}){
   const uH=(ci,v)=>upd({headers:tab.headers.map((h,i)=>i===ci?v:h)});
   return html`
     <div>
-      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>Ὄa Tabelas</h1>
+      <h1 style=${{fontSize:22,fontWeight:700,margin:'0 0 1.25rem',color:C.text}}>📊 Tabelas</h1>
       <div style=${{display:'grid',gridTemplateColumns:'210px 1fr',gap:'0.75rem',minHeight:480}}>
         <div style=${{...sc,padding:'0.85rem'}}>
           <div style=${{display:'flex',gap:5,marginBottom:'0.85rem'}}>
@@ -920,7 +920,7 @@ function Tabelas({tabelas,updateTabelas}){
               onAC=${()=>upd({headers:[...tab.headers,'Nova col'],rows:tab.rows.map(r=>[...r,''])})}
               onDR=${ri=>upd({rows:tab.rows.filter((_,i)=>i!==ri)})}
               onDC=${ci=>upd({headers:tab.headers.filter((_,i)=>i!==ci),rows:tab.rows.map(r=>r.filter((_,i)=>i!==ci))})}/>
-            <p style=${{fontSize:11,color:C.muted,marginTop:'0.85rem'}}>Ὂ1 Referencie em Notas com o bloco <strong>ὑ7 Ref. Tabela</strong></p>`}
+            <p style=${{fontSize:11,color:C.muted,marginTop:'0.85rem'}}>💡 Referencie em Notas com o bloco <strong>🔗 Ref. Tabela</strong></p>`}
           ${!tab&&html`<div style=${{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',color:C.muted,fontSize:13}}>← Selecione ou crie uma tabela</div>`}
         </div>
       </div>
@@ -938,7 +938,7 @@ function Metas({metas,updateMetas,addLog}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>Ἲf Metas & OKRs</h1>
+        <h1 style=${{fontSize:22,fontWeight:700,margin:0,color:C.text}}>🎯 Metas & OKRs</h1>
         <button onClick=${()=>{setForm({titulo:'',descricao:'',prazo:'',progresso:0});setEditId(null);setModal(true);}} style=${{...sb,background:C.primary,color:'#fff'}}>+ Nova</button>
       </div>
       ${metas.length===0&&html`<div style=${{textAlign:'center',color:C.muted,padding:'3rem',fontSize:14}}>Defina sua primeira meta!</div>`}
@@ -949,7 +949,7 @@ function Metas({metas,updateMetas,addLog}){
               <div style=${{display:'flex',alignItems:'center',gap:8,marginBottom:3,flexWrap:'wrap'}}>
                 <span style=${{fontWeight:700,fontSize:15,color:C.text}}>${m.titulo}</span>
                 ${p>=100&&html`<${Badge} label="Concluída" color=${C.done} sm=${true}/>`}
-                ${m.prazo&&html`<span style=${{fontSize:11,color:isOverdue(m.prazo)&&p<100?C.alta:C.muted}}>Ὄ5 ${fmt(m.prazo)}</span>`}
+                ${m.prazo&&html`<span style=${{fontSize:11,color:isOverdue(m.prazo)&&p<100?C.alta:C.muted}}>📅 ${fmt(m.prazo)}</span>`}
               </div>
               ${m.descricao&&html`<p style=${{fontSize:12,color:C.muted,marginBottom:8}}>${m.descricao}</p>`}
               <div style=${{display:'flex',alignItems:'center',gap:10}}>
@@ -960,7 +960,7 @@ function Metas({metas,updateMetas,addLog}){
             </div>
             <div style=${{display:'flex',gap:4,marginLeft:10}}>
               <button onClick=${()=>{setForm({titulo:m.titulo,descricao:m.descricao||'',prazo:m.prazo||'',progresso:m.progresso||0});setEditId(m.id);setModal(true);}} style=${{...sb,background:'transparent',border:'1px solid var(--cbr)',color:C.muted,padding:'0.15rem 0.4rem',fontSize:11}}>✏️</button>
-              <button onClick=${()=>updateMetas(metas.filter(x=>x.id!==m.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>Ὕ1</button>
+              <button onClick=${()=>updateMetas(metas.filter(x=>x.id!==m.id))} style=${{...sb,background:'transparent',color:C.alta,padding:'0.15rem 0.4rem',fontSize:11}}>🗑</button>
             </div>
           </div>
         </div>`;})}
@@ -986,8 +986,8 @@ function Busca({data}){
   const [q,setQ]=useState('');const sq=q.trim().toLowerCase();const results=[];
   if(sq.length>1){
     const chk=(items,tipo,emoji,sub)=>items.forEach(i=>{if((i.titulo||'').toLowerCase().includes(sq)||(i.notas||i.descricao||i.conteudo||'').toLowerCase().includes(sq))results.push({tipo,emoji,titulo:i.titulo||i.nome||'',sub:sub(i)});});
-    chk(data.tarefas,'Tarefa','✅',t=>t.status);chk(data.projetos,'Projeto','὜2️',p=>p.status);chk(data.reunioes,'Reunião','Ὄ5',r=>r.data?fmt(r.data):'');chk(data.ideias,'Ideia','Ὂ1',i=>i.tags||'');chk(data.notas,'Nota','Ὅ3',n=>n.atualizadaEm?fmt(n.atualizadaEm):'');chk(data.metas,'Meta','Ἲf',m=>m.progresso+'%');
-    data.tabelas.forEach(t=>{if(t.titulo.toLowerCase().includes(sq))results.push({tipo:'Tabela',emoji:'Ὄa',titulo:t.titulo,sub:t.headers.length+' col'});});
+    chk(data.tarefas,'Tarefa','✅',t=>t.status);chk(data.projetos,'Projeto','🗂️',p=>p.status);chk(data.reunioes,'Reunião','📅',r=>r.data?fmt(r.data):'');chk(data.ideias,'Ideia','💡',i=>i.tags||'');chk(data.notas,'Nota','📓',n=>n.atualizadaEm?fmt(n.atualizadaEm):'');chk(data.metas,'Meta','🎯',m=>m.progresso+'%');
+    data.tabelas.forEach(t=>{if(t.titulo.toLowerCase().includes(sq))results.push({tipo:'Tabela',emoji:'📊',titulo:t.titulo,sub:t.headers.length+' col'});});
   }
   return html`
     <div>
@@ -1282,7 +1282,7 @@ function Concursos({concursos,updateConcursos,addLog}){
   const tabs=[
     {id:'materias',label:'Ὅa Matérias'},
     {id:'questoes',label:'✏️ Questões'},
-    {id:'simulados',label:'Ὄa Simulados'},
+    {id:'simulados',label:'📊 Simulados'},
     {id:'edital',label:'Ὄb Edital'},
     {id:'horas',label:'⏰ Horas'},
   ];
@@ -1290,7 +1290,7 @@ function Concursos({concursos,updateConcursos,addLog}){
   return html`
     <div>
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem',flexWrap:'wrap',gap:10}}>
-        <h1 style=${{fontSize:24,fontWeight:700,color:C.text}}>Ἲf Concursos</h1>
+        <h1 style=${{fontSize:24,fontWeight:700,color:C.text}}>🎯 Concursos</h1>
       </div>
       <div style=${{display:'flex',gap:6,marginBottom:'1.5rem',flexWrap:'wrap'}}>
         ${tabs.map(t=>html`
